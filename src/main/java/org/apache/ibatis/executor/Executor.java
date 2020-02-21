@@ -53,7 +53,7 @@ public interface Executor {
   boolean isCached(MappedStatement ms, CacheKey key);
 
   void clearLocalCache();
-
+  //延迟加载
   void deferLoad(MappedStatement ms, MetaObject resultObject, String property, CacheKey key, Class<?> targetType);
 
   Transaction getTransaction();
@@ -62,6 +62,8 @@ public interface Executor {
 
   boolean isClosed();
 
+  //接口可以定义一个设置方法,不定义变量,再具体类定义变量,并在类中去实现;
+  //接口一般是用来定义行为准则
   void setExecutorWrapper(Executor executor);
 
 }

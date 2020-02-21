@@ -71,10 +71,13 @@ class SqlSessionTest extends BaseDataTest {
 
   @Test
   void shouldResolveBothSimpleNameAndFullyQualifiedName() {
+    // 两个cache,StrictMap继承了HashMap，重写了put方法，fullName and shortName 均被放入缓存中；
+    // fullName and shortName Key 不相同，value相同；
     Configuration c = new Configuration();
     final String fullName = "com.mycache.MyCache";
     final String shortName = "MyCache";
     final PerpetualCache cache = new PerpetualCache(fullName);
+    c.addCache(cache);
     c.addCache(cache);
     assertEquals(cache, c.getCache(fullName));
     assertEquals(cache, c.getCache(shortName));

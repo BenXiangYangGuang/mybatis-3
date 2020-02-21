@@ -84,7 +84,7 @@ public interface SqlSession extends Closeable {
    * @param <K> the returned Map keys type
    * @param <V> the returned Map values type
    * @param statement Unique identifier matching the statement to use.
-   * @param mapKey The property to use as key for each value in the list.
+   * @param mapKey The property to use as key for each value in the list. list 转 map；对象字段用来作为map的key，对象做为value； Id ： 1，author.id = 1,author.name = job
    * @return Map containing key pair data.
    */
   <K, V> Map<K, V> selectMap(String statement, String mapKey);
@@ -220,12 +220,14 @@ public interface SqlSession extends Closeable {
    * Flushes batch statements and commits database connection.
    * Note that database connection will not be committed if no updates/deletes/inserts were called.
    * To force the commit call {@link SqlSession#commit(boolean)}
+   * 除非遇到 updates deletes inserts 否则，transaction不会提交
    */
   void commit();
 
   /**
    * Flushes batch statements and commits database connection.
    * @param force forces connection commit
+   * true 强力提交transaction
    */
   void commit(boolean force);
 

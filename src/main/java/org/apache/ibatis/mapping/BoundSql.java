@@ -37,9 +37,9 @@ public class BoundSql {
 
   private final String sql;
   private final List<ParameterMapping> parameterMappings;
-  private final Object parameterObject;
-  private final Map<String, Object> additionalParameters;
-  private final MetaObject metaParameters;
+  private final Object parameterObject; //Author
+  private final Map<String, Object> additionalParameters; // example: loops, bind
+  private final MetaObject metaParameters; //处理additionalParameters 放入到 metaParameters
 
   public BoundSql(Configuration configuration, String sql, List<ParameterMapping> parameterMappings, Object parameterObject) {
     this.sql = sql;
@@ -65,7 +65,7 @@ public class BoundSql {
     String paramName = new PropertyTokenizer(name).getName();
     return additionalParameters.containsKey(paramName);
   }
-
+  //也会赋值给additionalParameters
   public void setAdditionalParameter(String name, Object value) {
     metaParameters.setValue(name, value);
   }

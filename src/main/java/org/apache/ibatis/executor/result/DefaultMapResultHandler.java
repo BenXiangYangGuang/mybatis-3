@@ -25,6 +25,7 @@ import org.apache.ibatis.session.ResultContext;
 import org.apache.ibatis.session.ResultHandler;
 
 /**
+ * 将结果行的包装对象resultContext，解析到添加到map中；用于将查询结果，返回为map格式
  * @author Clinton Begin
  */
 public class DefaultMapResultHandler<K, V> implements ResultHandler<V> {

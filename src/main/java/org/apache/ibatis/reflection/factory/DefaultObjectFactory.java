@@ -17,23 +17,14 @@ package org.apache.ibatis.reflection.factory;
 
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.ibatis.reflection.ReflectionException;
 import org.apache.ibatis.reflection.Reflector;
 
 /**
+ * 创造对象工厂,使用java.lang.reflection
  * @author Clinton Begin
  */
 public class DefaultObjectFactory implements ObjectFactory, Serializable {
@@ -53,14 +44,17 @@ public class DefaultObjectFactory implements ObjectFactory, Serializable {
     return (T) instantiateClass(classToCreate, constructorArgTypes, constructorArgs);
   }
 
+  //创造对象
   private  <T> T instantiateClass(Class<T> type, List<Class<?>> constructorArgTypes, List<Object> constructorArgs) {
     try {
       Constructor<T> constructor;
+      //无参构造函数
       if (constructorArgTypes == null || constructorArgs == null) {
         constructor = type.getDeclaredConstructor();
         try {
           return constructor.newInstance();
         } catch (IllegalAccessException e) {
+          //查看是否能控制成员的访问,能设置true,访问
           if (Reflector.canControlMemberAccessible()) {
             constructor.setAccessible(true);
             return constructor.newInstance();
@@ -69,8 +63,10 @@ public class DefaultObjectFactory implements ObjectFactory, Serializable {
           }
         }
       }
+      //根据参数得到对应的构造方法
       constructor = type.getDeclaredConstructor(constructorArgTypes.toArray(new Class[constructorArgTypes.size()]));
       try {
+        //构造对象实例
         return constructor.newInstance(constructorArgs.toArray(new Object[constructorArgs.size()]));
       } catch (IllegalAccessException e) {
         if (Reflector.canControlMemberAccessible()) {
@@ -100,6 +96,8 @@ public class DefaultObjectFactory implements ObjectFactory, Serializable {
     } else if (type == Set.class) {
       classToCreate = HashSet.class;
     } else {
+      //first:TreeMap is this type;maybe mybatis is not support the type;(only my guess)
+      //second: other original type:like java bean;String;
       classToCreate = type;
     }
     return classToCreate;

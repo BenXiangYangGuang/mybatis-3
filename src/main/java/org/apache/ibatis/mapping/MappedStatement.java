@@ -28,7 +28,7 @@ import org.apache.ibatis.logging.LogFactory;
 import org.apache.ibatis.scripting.LanguageDriver;
 import org.apache.ibatis.session.Configuration;
 
-/**
+/**查询sql语句的包装对象
  * @author Clinton Begin
  */
 public final class MappedStatement {
