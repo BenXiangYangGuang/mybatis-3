@@ -106,10 +106,10 @@ public class Configuration {
   protected boolean safeResultHandlerEnabled = true;
   protected boolean mapUnderscoreToCamelCase;
   protected boolean aggressiveLazyLoading;
-  protected boolean multipleResultSetsEnabled = true;
-  protected boolean useGeneratedKeys;
+  protected boolean multipleResultSetsEnabled = true; //allow multiple resultSets to be returned from a single statement
+  protected boolean useGeneratedKeys; // allows JDBC support generated keys
   protected boolean useColumnLabel = true;
-  protected boolean cacheEnabled = true;
+  protected boolean cacheEnabled = true;  //开启缓存
   protected boolean callSettersOnNulls;
   protected boolean useActualParamName = true;
   protected boolean returnInstanceForEmptyRow;
@@ -121,7 +121,7 @@ public class Configuration {
   protected JdbcType jdbcTypeForNull = JdbcType.OTHER;
   protected Set<String> lazyLoadTriggerMethods = new HashSet<>(Arrays.asList("equals", "clone", "hashCode", "toString"));
   protected Integer defaultStatementTimeout;
-  protected Integer defaultFetchSize;
+  protected Integer defaultFetchSize; //fetching size of results
   protected ResultSetType defaultResultSetType;
   protected ExecutorType defaultExecutorType = ExecutorType.SIMPLE;
   protected AutoMappingBehavior autoMappingBehavior = AutoMappingBehavior.PARTIAL;
@@ -132,7 +132,7 @@ public class Configuration {
   protected ObjectFactory objectFactory = new DefaultObjectFactory();
   protected ObjectWrapperFactory objectWrapperFactory = new DefaultObjectWrapperFactory();
 
-  protected boolean lazyLoadingEnabled = false;
+  protected boolean lazyLoadingEnabled = false; //all sasa will be lazily loaded
   protected ProxyFactory proxyFactory = new JavassistProxyFactory(); // #224 Using internal Javassist instead of OGNL
 
   protected String databaseId;
@@ -612,6 +612,7 @@ public class Configuration {
     if (cacheEnabled) {
       executor = new CachingExecutor(executor);
     }
+    //处理拦截器插件
     executor = (Executor) interceptorChain.pluginAll(executor);
     return executor;
   }
@@ -951,6 +952,7 @@ public class Configuration {
         if (super.get(shortKey) == null) {
           super.put(shortKey, value);
         } else {
+          //如果存在，放一个Ambiguity占位符，在get的时候，进行类型判断，类型相同抛出异常
           super.put(shortKey, (V) new Ambiguity(shortKey));
         }
       }
@@ -969,7 +971,7 @@ public class Configuration {
       }
       return value;
     }
-
+    // 模糊的
     protected static class Ambiguity {
       final private String subject;
 

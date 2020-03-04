@@ -20,20 +20,21 @@ import java.lang.reflect.Method;
 
 import org.apache.ibatis.reflection.Reflector;
 
-/**
+/**反射调用的方法和方法类型的封装
  * @author Clinton Begin
  */
 public class MethodInvoker implements Invoker {
 
-  private final Class<?> type;
-  private final Method method;
+  private final Class<?> type; //java.lang.Long
+  private final Method method; //public java.lang.Long org.apache.ibatis.reflection.ReflectorTest$AbstractEntity.getId()
 
   public MethodInvoker(Method method) {
     this.method = method;
-
+    //set()
     if (method.getParameterTypes().length == 1) {
       type = method.getParameterTypes()[0];
     } else {
+      //get()
       type = method.getReturnType();
     }
   }

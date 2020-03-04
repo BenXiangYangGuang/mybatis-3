@@ -19,6 +19,11 @@ import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author Clinton Begin
+ *
+ * Invoker 包含get set方法实现类 Invoker
+ * Invoker 包含get set属性 实现类 Invoker
+ * Invoker 包含模糊不清方法 实现类 Invoker
+ *
  */
 public interface Invoker {
   Object invoke(Object target, Object[] args) throws IllegalAccessException, InvocationTargetException;

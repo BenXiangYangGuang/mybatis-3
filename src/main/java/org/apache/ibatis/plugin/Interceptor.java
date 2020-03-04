@@ -29,7 +29,7 @@ public interface Interceptor {
   }
 
   default void setProperties(Properties properties) {
-    // NOP
+    // NOP No Operation Performed
   }
 
 }

@@ -18,6 +18,7 @@ package org.apache.ibatis.executor.result;
 import org.apache.ibatis.session.ResultContext;
 
 /**
+ * 结果上下文，将next元素放入此DefaultResultContext中；
  * @author Clinton Begin
  */
 public class DefaultResultContext<T> implements ResultContext<T> {

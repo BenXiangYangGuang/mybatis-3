@@ -19,6 +19,7 @@ import java.sql.ResultSet;
 
 /**
  * @author Clinton Begin
+ * 参考：https://www.iteye.com/blog/zhenkm0507-560109
  */
 public enum ResultSetType {
   /**
@@ -27,9 +28,9 @@ public enum ResultSetType {
    * @since 3.5.0
    */
   DEFAULT(-1),
-  FORWARD_ONLY(ResultSet.TYPE_FORWARD_ONLY),
-  SCROLL_INSENSITIVE(ResultSet.TYPE_SCROLL_INSENSITIVE),
-  SCROLL_SENSITIVE(ResultSet.TYPE_SCROLL_SENSITIVE);
+  FORWARD_ONLY(ResultSet.TYPE_FORWARD_ONLY), //结果集数据，游标只能向前移动，不能用于向后，first、last等
+  SCROLL_INSENSITIVE(ResultSet.TYPE_SCROLL_INSENSITIVE), //结果集数据,游标是可以移动的，对数据是数据库中的数据是不明感的
+  SCROLL_SENSITIVE(ResultSet.TYPE_SCROLL_SENSITIVE); //结果集的数据，游标是可以移动的，结果集中，会缓存每条数据的rowid，而不是真正的数据，其他session修改数据后，这个结果集的数据，查出来是跟着修改的
 
   private final int value;
 

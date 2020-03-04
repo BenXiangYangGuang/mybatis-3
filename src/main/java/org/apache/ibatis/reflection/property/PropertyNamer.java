@@ -21,13 +21,14 @@ import org.apache.ibatis.reflection.ReflectionException;
 
 /**
  * @author Clinton Begin
+ * 工具类 getter 和 setter 属性的处理方法;
  */
 public final class PropertyNamer {
 
   private PropertyNamer() {
     // Prevent Instantiation of Static Class
   }
-
+  //getId -> id;根据get和set方法;返回属性
   public static String methodToProperty(String name) {
     if (name.startsWith("is")) {
       name = name.substring(2);
@@ -36,7 +37,7 @@ public final class PropertyNamer {
     } else {
       throw new ReflectionException("Error parsing property name '" + name + "'.  Didn't start with 'is', 'get' or 'set'.");
     }
-
+    //作用 Id --> id;
     if (name.length() == 1 || (name.length() > 1 && !Character.isUpperCase(name.charAt(1)))) {
       name = name.substring(0, 1).toLowerCase(Locale.ENGLISH) + name.substring(1);
     }
@@ -47,11 +48,11 @@ public final class PropertyNamer {
   public static boolean isProperty(String name) {
     return isGetter(name) || isSetter(name);
   }
-
+  //是否包含 get方法 和 is方法
   public static boolean isGetter(String name) {
     return (name.startsWith("get") && name.length() > 3) || (name.startsWith("is") && name.length() > 2);
   }
-
+  //是否包含 set方法
   public static boolean isSetter(String name) {
     return name.startsWith("set") && name.length() > 3;
   }

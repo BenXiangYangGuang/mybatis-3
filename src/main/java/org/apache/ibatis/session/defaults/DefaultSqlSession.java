@@ -51,8 +51,8 @@ public class DefaultSqlSession implements SqlSession {
   private final Executor executor;
 
   private final boolean autoCommit;
-  private boolean dirty;
-  private List<Cursor<?>> cursorList;
+  private boolean dirty; // TODO: 19-12-18  数据是否脏了
+  private List<Cursor<?>> cursorList; // ??
 
   public DefaultSqlSession(Configuration configuration, Executor executor, boolean autoCommit) {
     this.configuration = configuration;
@@ -170,6 +170,7 @@ public class DefaultSqlSession implements SqlSession {
     } catch (Exception e) {
       throw ExceptionFactory.wrapException("Error querying database.  Cause: " + e, e);
     } finally {
+      // TODO: 19-12-18 use case；play a role
       ErrorContext.instance().reset();
     }
   }
@@ -181,6 +182,7 @@ public class DefaultSqlSession implements SqlSession {
 
   @Override
   public int insert(String statement, Object parameter) {
+    //调用了update语句
     return update(statement, parameter);
   }
 
@@ -316,6 +318,11 @@ public class DefaultSqlSession implements SqlSession {
     return (!autoCommit && dirty) || force;
   }
 
+  /**
+   * 查询参数包装
+   * @param object
+   * @return
+   */
   private Object wrapCollection(final Object object) {
     if (object instanceof Collection) {
       StrictMap<Object> map = new StrictMap<>();

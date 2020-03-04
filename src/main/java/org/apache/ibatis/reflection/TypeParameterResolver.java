@@ -25,7 +25,7 @@ import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.Arrays;
 
-/**
+/**参数化类型，解决器；对于复杂的参数，进行解决并返回；比如泛型；
  * @author Iwao AVE!
  */
 public class TypeParameterResolver {
@@ -39,13 +39,17 @@ public class TypeParameterResolver {
     Class<?> declaringClass = field.getDeclaringClass();
     return resolveType(fieldType, srcType, declaringClass);
   }
-
+//  method:public java.lang.Long org.apache.ibatis.reflection.ReflectorTest$AbstractEntity.getId()
+//  srcType:class org.apache.ibatis.reflection.ReflectorTest$Section
   /**
+   * 返回参数化类型，如果是复杂的参数化类型，并解决他；
    * @return The return type of the method as {@link Type}. If it has type parameters in the declaration,<br>
    *         they will be resolved to the actual runtime {@link Type}s.
    */
   public static Type resolveReturnType(Method method, Type srcType) {
+    //class java.lang.Long
     Type returnType = method.getGenericReturnType();
+    //class org.apache.ibatis.reflection.ReflectorTest$AbstractEntity
     Class<?> declaringClass = method.getDeclaringClass();
     return resolveType(returnType, srcType, declaringClass);
   }
@@ -63,8 +67,9 @@ public class TypeParameterResolver {
     }
     return result;
   }
-
+  //解决复杂的参数化类型，等等
   private static Type resolveType(Type type, Type srcType, Class<?> declaringClass) {
+    //T 泛型变量
     if (type instanceof TypeVariable) {
       return resolveTypeVar((TypeVariable<?>) type, srcType, declaringClass);
     } else if (type instanceof ParameterizedType) {

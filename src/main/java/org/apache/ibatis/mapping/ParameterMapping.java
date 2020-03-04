@@ -23,6 +23,8 @@ import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.TypeHandlerRegistry;
 
 /**
+ * 参数容器
+ * <parameter property="" resultMap="" javaType="" typeHandler="" jdbcType="" mode="" scale=""></parameter>
  * @author Clinton Begin
  */
 public class ParameterMapping {

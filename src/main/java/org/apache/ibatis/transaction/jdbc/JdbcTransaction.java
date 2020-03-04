@@ -31,6 +31,11 @@ import org.apache.ibatis.transaction.TransactionException;
  * Delays connection retrieval until getConnection() is called.
  * Ignores commit or rollback requests when autocommit is on.
  *
+ * 事务直接使用了JDBC提供的 提交和回滚基础设施.
+ * 事务依赖于从数据库连接池中重新获取的链接，来管理事务的生命周期.
+ * 懒加载，直到调用了getConnection()才会从数据库连接池中重新获取connection.
+ * 当设置了自动提交，忽略commit和rollback.
+ *
  * @author Clinton Begin
  *
  * @see JdbcTransactionFactory
@@ -74,6 +79,7 @@ public class JdbcTransaction implements Transaction {
 
   @Override
   public void rollback() throws SQLException {
+    //connection 存在,自动提交:false,rollback();
     if (connection != null && !connection.getAutoCommit()) {
       if (log.isDebugEnabled()) {
         log.debug("Rolling back JDBC Connection [" + connection + "]");

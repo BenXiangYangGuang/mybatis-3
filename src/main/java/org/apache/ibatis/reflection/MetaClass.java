@@ -28,6 +28,7 @@ import org.apache.ibatis.reflection.property.PropertyTokenizer;
 
 /**
  * @author Clinton Begin
+ * MetaClass 是 MyBatis 对类级别的元信息的封装和处理
  */
 public class MetaClass {
 

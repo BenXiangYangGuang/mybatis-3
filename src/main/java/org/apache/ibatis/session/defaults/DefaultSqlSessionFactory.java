@@ -137,7 +137,7 @@ public class DefaultSqlSessionFactory implements SqlSessionFactory {
       try {
         tx.close();
       } catch (SQLException ignore) {
-        // Intentionally ignore. Prefer previous error.
+        // Intentionally ignore. Prefer previous error. 故意忽略喜欢先前的错误；
       }
     }
   }

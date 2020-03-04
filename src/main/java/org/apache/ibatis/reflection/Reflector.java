@@ -49,25 +49,26 @@ import org.apache.ibatis.reflection.property.PropertyNamer;
  */
 public class Reflector {
 
-  private final Class<?> type;
-  private final String[] readablePropertyNames;
-  private final String[] writablePropertyNames;
-  private final Map<String, Invoker> setMethods = new HashMap<>();
+  private final Class<?> type; //类名称 Section
+  private final String[] readablePropertyNames; //可读的类属性 id
+  private final String[] writablePropertyNames; //可写的类属性 id
+  private final Map<String, Invoker> setMethods = new HashMap<>(); //<属性，set方法> id,setId
   private final Map<String, Invoker> getMethods = new HashMap<>();
   private final Map<String, Class<?>> setTypes = new HashMap<>();
-  private final Map<String, Class<?>> getTypes = new HashMap<>();
+  private final Map<String, Class<?>> getTypes = new HashMap<>(); //<属性，get方法> id,java.lang.Long
   private Constructor<?> defaultConstructor;
 
-  private Map<String, String> caseInsensitivePropertyMap = new HashMap<>();
+  private Map<String, String> caseInsensitivePropertyMap = new HashMap<>();  //元素为属性大小写不敏感的; ID :id
 
   public Reflector(Class<?> clazz) {
     type = clazz;
-    addDefaultConstructor(clazz);
+    addDefaultConstructor(clazz); //赋值默认的构造函数
     addGetMethods(clazz);
     addSetMethods(clazz);
-    addFields(clazz);
+    addFields(clazz); //处理没有getter、setter方法的字段
     readablePropertyNames = getMethods.keySet().toArray(new String[0]);
     writablePropertyNames = setMethods.keySet().toArray(new String[0]);
+    //读写属性重复，会覆盖
     for (String propName : readablePropertyNames) {
       caseInsensitivePropertyMap.put(propName.toUpperCase(Locale.ENGLISH), propName);
     }
@@ -82,19 +83,25 @@ public class Reflector {
       .findAny().ifPresent(constructor -> this.defaultConstructor = constructor);
   }
 
-  private void addGetMethods(Class<?> clazz) {
+  private void addGetMethods(Class<?> clazz) {//class org.apache.ibatis.reflection.ReflectorTest$Section
     Map<String, List<Method>> conflictingGetters = new HashMap<>();
+    //4 methods
+//    public abstract java.lang.Object org.apache.ibatis.reflection.ReflectorTest$Entity.getId()
+//    public java.lang.Long org.apache.ibatis.reflection.ReflectorTest$AbstractEntity.getId()
+//    public void org.apache.ibatis.reflection.ReflectorTest$AbstractEntity.setId(java.lang.Long)
+//    public abstract void org.apache.ibatis.reflection.ReflectorTest$Entity.setId(java.lang.Object)
+
     Method[] methods = getClassMethods(clazz);
     Arrays.stream(methods).filter(m -> m.getParameterTypes().length == 0 && PropertyNamer.isGetter(m.getName()))
       .forEach(m -> addMethodConflict(conflictingGetters, PropertyNamer.methodToProperty(m.getName()), m));
     resolveGetterConflicts(conflictingGetters);
   }
-
+  //解决多个类、多个接口 的继承 和实现 之间的 多个getter方法 冲突；保留最小辈（下限）类的get方法，
   private void resolveGetterConflicts(Map<String, List<Method>> conflictingGetters) {
     for (Entry<String, List<Method>> entry : conflictingGetters.entrySet()) {
       Method winner = null;
       String propName = entry.getKey();
-      boolean isAmbiguous = false;
+      boolean isAmbiguous = false; //模糊不清的;这个属性的方式 是否是 模糊不清楚的；如果一个类是模糊不清楚的；最终会抛出AmbiguousMethodInvoker
       for (Method candidate : entry.getValue()) {
         if (winner == null) {
           winner = candidate;
@@ -109,6 +116,7 @@ public class Reflector {
           } else if (candidate.getName().startsWith("is")) {
             winner = candidate;
           }
+//          Object.isAssignableFrom(String.class)  true --> string is assignable from object ; string 是被检查的类; object 是 string supper 类
         } else if (candidateType.isAssignableFrom(winnerType)) {
           // OK getter type is descendant
         } else if (winnerType.isAssignableFrom(candidateType)) {
@@ -200,6 +208,7 @@ public class Reflector {
     setTypes.put(name, typeToClass(paramTypes[0]));
   }
 
+  //将一个类型，转化为相应的class类
   private Class<?> typeToClass(Type src) {
     Class<?> result = null;
     if (src instanceof Class) {
@@ -220,7 +229,7 @@ public class Reflector {
     }
     return result;
   }
-
+  //一个递归的调用关系;处理特殊的field
   private void addFields(Class<?> clazz) {
     Field[] fields = clazz.getDeclaredFields();
     for (Field field : fields) {
@@ -257,7 +266,7 @@ public class Reflector {
       getTypes.put(field.getName(), typeToClass(fieldType));
     }
   }
-
+  //是否有效的属性值
   private boolean isValidPropertyName(String name) {
     return !(name.startsWith("$") || "serialVersionUID".equals(name) || "class".equals(name));
   }
@@ -377,6 +386,7 @@ public class Reflector {
 
   /**
    * Gets the type for a property setter.
+   * 获取一个属性的,一个setter()方法的属性类型
    *
    * @param propertyName - the name of the property
    * @return The Class of the property setter

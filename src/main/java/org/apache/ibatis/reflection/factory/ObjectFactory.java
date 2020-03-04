@@ -31,6 +31,7 @@ public interface ObjectFactory {
    */
   default void setProperties(Properties properties) {
     // NOP
+    //No Operation Performed 无操作执行
   }
 
   /**

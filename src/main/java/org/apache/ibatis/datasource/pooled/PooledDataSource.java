@@ -151,7 +151,7 @@ public class PooledDataSource implements DataSource {
 
   /**
    * Sets the default network timeout value to wait for the database operation to complete. See {@link Connection#setNetworkTimeout(java.util.concurrent.Executor, int)}
-   * 
+   *
    * @param milliseconds
    *          The time in milliseconds to wait for the database operation to complete.
    * @since 3.5.2
@@ -361,7 +361,7 @@ public class PooledDataSource implements DataSource {
   private int assembleConnectionTypeCode(String url, String username, String password) {
     return ("" + url + username + password).hashCode();
   }
-
+  //调用connect.close() PooledConnection 反射调用 close(),将connect从激活的activeConnections中移除
   protected void pushConnection(PooledConnection conn) throws SQLException {
 
     synchronized (state) {
@@ -372,6 +372,7 @@ public class PooledDataSource implements DataSource {
           if (!conn.getRealConnection().getAutoCommit()) {
             conn.getRealConnection().rollback();
           }
+          //数据库connect重新包装为PooledConnect放入，idleConnections中
           PooledConnection newConn = new PooledConnection(conn.getRealConnection(), this);
           state.idleConnections.add(newConn);
           newConn.setCreatedTimestamp(conn.getCreatedTimestamp());

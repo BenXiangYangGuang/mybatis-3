@@ -60,7 +60,7 @@ public abstract class BaseExecutor implements Executor {
   protected Configuration configuration;
 
   protected int queryStack;
-  private boolean closed;
+  private boolean closed; // executor status
 
   protected BaseExecutor(Configuration configuration, Transaction transaction) {
     this.transaction = transaction;
@@ -80,6 +80,7 @@ public abstract class BaseExecutor implements Executor {
     return transaction;
   }
 
+  //session.close();真实的是executor.close()
   @Override
   public void close(boolean forceRollback) {
     try {
@@ -93,6 +94,7 @@ public abstract class BaseExecutor implements Executor {
     } catch (SQLException e) {
       // Ignore.  There's nothing that can be done at this point.
       log.warn("Unexpected exception on closing transaction.  Cause: " + e);
+      //异常之后,清空所有session资源,并关闭session closed = true;
     } finally {
       transaction = null;
       deferredLoads = null;
@@ -150,6 +152,7 @@ public abstract class BaseExecutor implements Executor {
     try {
       queryStack++;
       list = resultHandler == null ? (List<E>) localCache.getObject(key) : null;
+      //缓存没有,从数据库查询
       if (list != null) {
         handleLocallyCachedOutputParameters(ms, key, parameter, boundSql);
       } else {
@@ -190,7 +193,7 @@ public abstract class BaseExecutor implements Executor {
       deferredLoads.add(new DeferredLoad(resultObject, property, key, localCache, configuration, targetType));
     }
   }
-
+  //根据查询语句的不同,生成特别的唯一的key
   @Override
   public CacheKey createCacheKey(MappedStatement ms, Object parameterObject, RowBounds rowBounds, BoundSql boundSql) {
     if (closed) {
@@ -249,10 +252,10 @@ public abstract class BaseExecutor implements Executor {
   public void rollback(boolean required) throws SQLException {
     if (!closed) {
       try {
-        clearLocalCache();
-        flushStatements(true);
+        clearLocalCache(); //清空缓存
+        flushStatements(true); // 刷新所有statements
       } finally {
-        if (required) {
+        if (required) { //true:事务回滚
           transaction.rollback();
         }
       }

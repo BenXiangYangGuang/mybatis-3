@@ -39,6 +39,10 @@ public class DefaultReflectorFactory implements ReflectorFactory {
   public Reflector findForClass(Class<?> type) {
     if (classCacheEnabled) {
       // synchronized (type) removed see issue #461
+//      If the specified key is not already associated with a value,
+//      attempts to compute its value using the given mapping function
+//      and enters it into this map unless {@code null}.
+//      absent 缺席的;如果type值不存在,就应用后面的函数,计算出来,计算结果非空,放入map中;并返回计算值;
       return reflectorMap.computeIfAbsent(type, Reflector::new);
     } else {
       return new Reflector(type);
