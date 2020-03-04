@@ -19,13 +19,16 @@ import java.util.Iterator;
 
 /**
  * 分词器,编译器
+ * orders[0].items[0].name
+ * 实现了Iterator，具有迭代功能
  * @author Clinton Begin
  */
 public class PropertyTokenizer implements Iterator<PropertyTokenizer> {
-  private String name;
-  private final String indexedName;
-  private String index;
-  private final String children;
+//  orders[0].items[0].name 第一次迭代
+  private String name; //当前表达式的名称 orders
+  private final String indexedName; //当前表达式的索引名  orders[0]
+  private String index; //索引下标 0
+  private final String children; //子表达式 items[0].name
 
   public PropertyTokenizer(String fullname) {
     int delim = fullname.indexOf('.');

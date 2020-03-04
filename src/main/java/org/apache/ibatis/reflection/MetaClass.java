@@ -43,7 +43,7 @@ public class MetaClass {
   public static MetaClass forClass(Class<?> type, ReflectorFactory reflectorFactory) {
     return new MetaClass(type, reflectorFactory);
   }
-
+  //根据属性获取MetaClass
   public MetaClass metaClassForProperty(String name) {
     Class<?> propType = reflector.getGetterType(name);
     return MetaClass.forClass(propType, reflectorFactory);
