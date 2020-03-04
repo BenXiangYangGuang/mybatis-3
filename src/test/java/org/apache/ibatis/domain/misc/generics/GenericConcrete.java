@@ -14,7 +14,8 @@
  *    limitations under the License.
  */
 package org.apache.ibatis.domain.misc.generics;
-
+//GenericSubclass getter
+//GenericInterface setter
 public class GenericConcrete extends GenericSubclass implements GenericInterface<Long> {
   private Long id;
 

@@ -53,7 +53,7 @@ public class MetaClass {
     StringBuilder prop = buildProperty(name, new StringBuilder());
     return prop.length() > 0 ? prop.toString() : null;
   }
-
+  //第二个参数表示是否忽略属性表达式中的下画线
   public String findProperty(String name, boolean useCamelCaseMapping) {
     if (useCamelCaseMapping) {
       name = name.replace("_", "");

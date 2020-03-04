@@ -20,6 +20,8 @@ import org.apache.ibatis.reflection.ReflectionException;
 
 /**
  * @author Clinton Begin
+ * DefaultObjectWrapperFactory 实现了 ObjectWrapperFactory 接口,但它实现的 getWrapperFor()
+ * 方法始终抛出异常, hasWrapperFor()方法始终返回 false ,所以该实现实际上是不可用的。
  */
 public class DefaultObjectWrapperFactory implements ObjectWrapperFactory {
 

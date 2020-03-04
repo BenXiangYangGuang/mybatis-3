@@ -19,6 +19,7 @@ import org.apache.ibatis.reflection.MetaObject;
 
 /**
  * @author Clinton Begin
+ * 包装对象生产工厂
  */
 public interface ObjectWrapperFactory {
 

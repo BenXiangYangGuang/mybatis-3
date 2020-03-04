@@ -22,6 +22,7 @@ import org.apache.ibatis.reflection.wrapper.ObjectWrapperFactory;
 
 /**
  * @author Clinton Begin
+ * 系统初始化对象的，默认值
  */
 public final class SystemMetaObject {
 

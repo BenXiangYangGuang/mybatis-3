@@ -27,28 +27,26 @@ import org.apache.ibatis.reflection.wrapper.MapWrapper;
 import org.apache.ibatis.reflection.wrapper.ObjectWrapper;
 import org.apache.ibatis.reflection.wrapper.ObjectWrapperFactory;
 
-/**MetaObject是Mybatis提供的一个用于方便、优雅访问对象属性的对象，通过它可以简化代码、不需要try/catch各种reflect异常，同时它支持对JavaBean、Collection、Map三种类型对象的操作。
-<<<<<<< HEAD
+/**MetaObject 包装了objectWrapper，从而提供了对 对象属性 的操作
+ * MetaObject是Mybatis提供的一个用于方便、优雅访问对象属性的对象，
+ * 通过它可以简化代码、不需要try/catch各种reflect异常，同时它支持对JavaBean、Collection、Map三种类型对象的操作。
  * 对 对象的 对属 性表达式解析过程
-=======
->>>>>>> 428f300201ec1c6b51586c8e1e3e6929f06bb5c1
- * https://blog.csdn.net/u013769320/article/details/50492965
  * @author Clinton Begin
  */
 public class MetaObject {
 
-  private final Object originalObject;
-  private final ObjectWrapper objectWrapper;
-  private final ObjectFactory objectFactory;
-  private final ObjectWrapperFactory objectWrapperFactory;
-  private final ReflectorFactory reflectorFactory;
+  private final Object originalObject;  //原始JavaBean对象
+  private final ObjectWrapper objectWrapper; //其中封装了originalObject对象
+  private final ObjectFactory objectFactory; //创建对象的工厂
+  private final ObjectWrapperFactory objectWrapperFactory; //创建封装对象的工厂
+  private final ReflectorFactory reflectorFactory; //反射工厂
 
   private MetaObject(Object object, ObjectFactory objectFactory, ObjectWrapperFactory objectWrapperFactory, ReflectorFactory reflectorFactory) {
     this.originalObject = object;
     this.objectFactory = objectFactory;
     this.objectWrapperFactory = objectWrapperFactory;
     this.reflectorFactory = reflectorFactory;
-
+    //赋值给objectWrapper
     if (object instanceof ObjectWrapper) {
       this.objectWrapper = (ObjectWrapper) object;
     } else if (objectWrapperFactory.hasWrapperFor(object)) {
@@ -64,6 +62,7 @@ public class MetaObject {
 
   public static MetaObject forObject(Object object, ObjectFactory objectFactory, ObjectWrapperFactory objectWrapperFactory, ReflectorFactory reflectorFactory) {
     if (object == null) {
+      //系统初始化，默认的对象
       return SystemMetaObject.NULL_META_OBJECT;
     } else {
       return new MetaObject(object, objectFactory, objectWrapperFactory, reflectorFactory);
@@ -113,7 +112,7 @@ public class MetaObject {
   public boolean hasGetter(String name) {
     return objectWrapper.hasGetter(name);
   }
-
+  //获取对象属性
   public Object getValue(String name) {
     PropertyTokenizer prop = new PropertyTokenizer(name);
     if (prop.hasNext()) {
@@ -127,7 +126,7 @@ public class MetaObject {
       return objectWrapper.get(prop);
     }
   }
-
+  //设置对象属性
   public void setValue(String name, Object value) {
     PropertyTokenizer prop = new PropertyTokenizer(name);
     if (prop.hasNext()) {
@@ -145,7 +144,7 @@ public class MetaObject {
       objectWrapper.set(prop, value);
     }
   }
-
+  //根据属性名称获得MetaObject对象
   public MetaObject metaObjectForProperty(String name) {
     Object value = getValue(name);
     return MetaObject.forObject(value, objectFactory, objectWrapperFactory, reflectorFactory);
