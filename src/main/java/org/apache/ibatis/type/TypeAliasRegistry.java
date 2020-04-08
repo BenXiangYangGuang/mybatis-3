@@ -33,6 +33,8 @@ import org.apache.ibatis.io.ResolverUtil;
 import org.apache.ibatis.io.Resources;
 
 /**
+ * MyBatis 将 SQL 语句中别名的概念进行了延伸和扩展 , MyBatis
+ * 可以为一个类添加一个别名,之后就可以通过别名引用该类。
  * @author Clinton Begin
  */
 public class TypeAliasRegistry {
@@ -108,8 +110,9 @@ public class TypeAliasRegistry {
         return null;
       }
       // issue #748
-      String key = string.toLowerCase(Locale.ENGLISH);
+      String key = string.toLowerCase(Locale.ENGLISH); // 将别名转换为小写
       Class<T> value;
+      //检测别名是否 已经存在
       if (typeAliases.containsKey(key)) {
         value = (Class<T>) typeAliases.get(key);
       } else {
@@ -120,18 +123,20 @@ public class TypeAliasRegistry {
       throw new TypeException("Could not resolve type alias '" + string + "'.  Cause: " + e, e);
     }
   }
-
+  //通过包名称，进行别名扫面注册
   public void registerAliases(String packageName) {
     registerAliases(packageName, Object.class);
   }
 
   public void registerAliases(String packageName, Class<?> superType) {
     ResolverUtil<Class<?>> resolverUtil = new ResolverUtil<>();
+    // 查找指定包下的 superType 类型类
     resolverUtil.find(new ResolverUtil.IsA(superType), packageName);
     Set<Class<? extends Class<?>>> typeSet = resolverUtil.getClasses();
     for (Class<?> type : typeSet) {
       // Ignore inner classes and interfaces (including package-info.java)
       // Skip also inner classes. See issue #6
+      // 过滤掉略内部类 、接 口 以及抽象类
       if (!type.isAnonymousClass() && !type.isInterface() && !type.isMemberClass()) {
         registerAlias(type);
       }
@@ -139,11 +144,13 @@ public class TypeAliasRegistry {
   }
 
   public void registerAlias(Class<?> type) {
-    String alias = type.getSimpleName();
+    String alias = type.getSimpleName(); // 类 的简单名称(不包含包名 )
+    // 读取@ Alias 主解
     Alias aliasAnnotation = type.getAnnotation(Alias.class);
     if (aliasAnnotation != null) {
       alias = aliasAnnotation.value();
     }
+    //检测此 别名不存在后,会将其记录到 TYPE ALIASES 集合中
     registerAlias(alias, type);
   }
 

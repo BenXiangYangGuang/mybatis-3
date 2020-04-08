@@ -17,7 +17,7 @@ package org.apache.ibatis.reflection.typeparam;
 
 import java.util.List;
 import java.util.Map;
-
+//一级Mapper用来解决TypeParameterResolver的测试实体
 public interface Level0Mapper<L, M, N> {
 
   void simpleSelectVoid(Integer param);
@@ -35,7 +35,7 @@ public interface Level0Mapper<L, M, N> {
   String[][] simpleSelectArrayOfArray();
 
   <K extends Calculator<?>> K simpleSelectTypeVar();
-
+  //wild 自然的野生的
   List<? extends String> simpleSelectWildcard();
 
   N select(N param);

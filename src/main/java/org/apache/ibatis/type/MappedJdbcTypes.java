@@ -47,6 +47,7 @@ public @interface MappedJdbcTypes {
 
   /**
    * Returns whether map to jdbc null type.
+   * 映射到jdbc空类型，return true； else return false
    *
    * @return {@code true} if map, {@code false} if otherwise
    */

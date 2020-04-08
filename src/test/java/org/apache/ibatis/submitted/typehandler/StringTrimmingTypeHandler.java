@@ -25,6 +25,13 @@ import org.apache.ibatis.type.MappedJdbcTypes;
 import org.apache.ibatis.type.MappedTypes;
 import org.apache.ibatis.type.TypeHandler;
 
+/**
+ * remove leading and trailing whitespace
+ * String.trim()
+ *
+ * @MappedTypes 注解用于指明该 TypeHandler 实现类能够处理的 Java 类型的集合 ,
+ * @MappedJdbcTypes 注解用于指明该 TypeHandler 实现类能够处理的 JDBC 类型集合。
+ */
 @MappedTypes(String.class)
 @MappedJdbcTypes(value={JdbcType.CHAR,JdbcType.VARCHAR}, includeNullJdbcType=true)
 public class StringTrimmingTypeHandler implements TypeHandler<String> {

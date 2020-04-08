@@ -87,6 +87,7 @@ public class ArrayTypeHandler extends BaseTypeHandler<Object> {
             "ArrayType Handler requires SQL array or java array parameter and does not support type "
                 + parameter.getClass());
       }
+      //处理数组形式 new String[] { "Hello World" }
       Class<?> componentType = parameter.getClass().getComponentType();
       String arrayTypeName = resolveTypeName(componentType);
       Array array = ps.getConnection().createArrayOf(arrayTypeName, (Object[]) parameter);

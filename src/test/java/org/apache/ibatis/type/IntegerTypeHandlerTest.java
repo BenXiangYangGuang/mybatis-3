@@ -47,6 +47,7 @@ class IntegerTypeHandlerTest extends BaseTypeHandlerTest {
   @Test
   public void shouldGetResultNullFromResultSetByName() throws Exception {
     when(rs.getInt("column")).thenReturn(0);
+    // TODO: 2020/3/5 rs.wasNull 这一行的最后一列的检索值，如果为 null，返回true，否则false
     when(rs.wasNull()).thenReturn(true);
     assertNull(TYPE_HANDLER.getResult(rs, "column"));
   }

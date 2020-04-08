@@ -20,12 +20,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-/**
+/**枚举类型处理器
  * @author Clinton Begin
  */
 public class EnumTypeHandler<E extends Enum<E>> extends BaseTypeHandler<E> {
 
-  private final Class<E> type;
+  private final Class<E> type; //枚举类型
 
   public EnumTypeHandler(Class<E> type) {
     if (type == null) {

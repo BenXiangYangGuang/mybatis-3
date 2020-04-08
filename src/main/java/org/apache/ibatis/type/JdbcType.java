@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * jdbc 数据类型和java.sql.Types 数据类型转换映射
  * @author Clinton Begin
  */
 public enum JdbcType {

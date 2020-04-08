@@ -27,7 +27,10 @@ import java.util.function.Supplier;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.Configuration;
 
-/**
+/** 未知数据类型处理器；
+ * 通过类型处理器注册器中的注册信息可以看出这种类型处理器所对应的JavaType是Object类型，对应的JdbcType是OTHER类型，
+ * 这个OTHER是什么类型？我们可以这么理解，市面上数据库种类繁多，而且各有特点，这些数据库产品即满足SQL规范，同时也有各自的扩展和强化，
+ * 每个数据库内部都有一些自定义的只在其内部起作用的数据类型，而这些类型反映到Java中之后是Object类型时，这里就将其统一定义为OTHER类型。
  * @author Clinton Begin
  */
 public class UnknownTypeHandler extends BaseTypeHandler<Object> {
@@ -89,7 +92,7 @@ public class UnknownTypeHandler extends BaseTypeHandler<Object> {
       throws SQLException {
     return cs.getObject(columnIndex);
   }
-
+  //解决未知类型处理器
   private TypeHandler<?> resolveTypeHandler(Object parameter, JdbcType jdbcType) {
     TypeHandler<?> handler;
     if (parameter == null) {

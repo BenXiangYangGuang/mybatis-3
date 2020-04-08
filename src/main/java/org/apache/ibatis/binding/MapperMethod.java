@@ -201,7 +201,7 @@ public class MapperMethod {
     }
     return result;
   }
-
+  // 强制类型Map，key 为 String type
   public static class ParamMap<V> extends HashMap<String, V> {
 
     private static final long serialVersionUID = -2212268410512043556L;
