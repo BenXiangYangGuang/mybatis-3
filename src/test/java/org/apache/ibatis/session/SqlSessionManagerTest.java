@@ -29,7 +29,7 @@ import org.apache.ibatis.exceptions.PersistenceException;
 import org.apache.ibatis.io.Resources;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
+//程序入库测试
 class SqlSessionManagerTest extends BaseDataTest {
 
   private static SqlSessionManager manager;

@@ -49,6 +49,7 @@ import org.apache.ibatis.type.JdbcType;
 /**
  * @author Clinton Begin
  * @author Kazuki Shimizu
+ * `XMLConfigBuilder` 是一个读取并解析 mybats 配置的文件的类；
  */
 public class XMLConfigBuilder extends BaseBuilder {
 
@@ -102,7 +103,13 @@ public class XMLConfigBuilder extends BaseBuilder {
   private void parseConfiguration(XNode root) {
     try {
       //issue #117 read properties first
+
+      //<properties resource="org/apache/ibatis/databases/blog/blog-derby.properties"/>
       propertiesElement(root.evalNode("properties"));
+      //  <settings>
+      //    <setting name="cacheEnabled" value="true"/>
+      //    <setting name="lazyLoadingEnabled" value="false"/>
+      //  </settings>
       Properties settings = settingsAsProperties(root.evalNode("settings"));
       loadCustomVfs(settings);
       loadCustomLogImpl(settings);
@@ -217,10 +224,12 @@ public class XMLConfigBuilder extends BaseBuilder {
       configuration.setReflectorFactory(factory);
     }
   }
-
+  //解析properties节点
   private void propertiesElement(XNode context) throws Exception {
     if (context != null) {
+      //得到所有的孩子属性；
       Properties defaults = context.getChildrenAsProperties();
+      //parse only one resource element ： resource or url
       String resource = context.getStringAttribute("resource");
       String url = context.getStringAttribute("url");
       if (resource != null && url != null) {
@@ -235,7 +244,9 @@ public class XMLConfigBuilder extends BaseBuilder {
       if (vars != null) {
         defaults.putAll(vars);
       }
+      //设置 解析器 variables
       parser.setVariables(defaults);
+      //更新 configuration 的 variables 变量
       configuration.setVariables(defaults);
     }
   }

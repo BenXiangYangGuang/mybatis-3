@@ -29,10 +29,13 @@ import org.apache.ibatis.reflection.property.PropertyTokenizer;
 /**
  * @author Clinton Begin
  * MetaClass 是 MyBatis 对类级别的元信息的封装和处理
+ *
+ * MetaClass 通过 Reflector 和 PropertyTokenizer 组合使用, 实现了对复杂的属性表达式的解析,并实现了获取指定属性描述信息的功能。
  */
 public class MetaClass {
-
+  //ReflectorFactory 对象,用于缓存 Reflector 对象
   private final ReflectorFactory reflectorFactory;
+  //在创建 MetaClass 时会指定一个类,该 Reflector 对象会用于记录该类相关 的元信息
   private final Reflector reflector;
 
   private MetaClass(Class<?> type, ReflectorFactory reflectorFactory) {

@@ -29,6 +29,10 @@ import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.TypeHandlerRegistry;
 
 /**
+ * `BaseBuilder` 是一个基础抽象类，定义了一些通用方法，有多个具体实现类；解决 `typeAlias` 类型别名，及找到别名相应的`TypeHandler`类型处理器；还有一些简单的工具方法；
+ * `Configuration` mybatis 全局配置对象；
+ * `TypeAliasRegistry` 类型别名注册中心，处理各种类型别名；
+ * `TypeHandlerRegistry` 类型处理器注册中心，处理各种TypeHandler，包含别名类型处理器；
  * @author Clinton Begin
  */
 public abstract class BaseBuilder {
@@ -46,23 +50,51 @@ public abstract class BaseBuilder {
     return configuration;
   }
 
+  /**
+   * 编译正则表达式
+   * @param regex 表达式
+   * @param defaultValue 表达式默认值
+   * @return
+   */
   protected Pattern parseExpression(String regex, String defaultValue) {
     return Pattern.compile(regex == null ? defaultValue : regex);
   }
 
+  /**
+   * 处理 Boolean 类型字符串
+   * @param value
+   * @param defaultValue
+   * @return
+   */
   protected Boolean booleanValueOf(String value, Boolean defaultValue) {
     return value == null ? defaultValue : Boolean.valueOf(value);
   }
-
+  /**
+   * 处理 Integer 类型字符串
+   * @param value
+   * @param defaultValue
+   * @return
+   */
   protected Integer integerValueOf(String value, Integer defaultValue) {
     return value == null ? defaultValue : Integer.valueOf(value);
   }
 
+  /**
+   * 处理‘，’分割的字符串为 `Set` 集合
+   * @param value
+   * @param defaultValue
+   * @return
+   */
   protected Set<String> stringSetValueOf(String value, String defaultValue) {
     value = value == null ? defaultValue : value;
     return new HashSet<>(Arrays.asList(value.split(",")));
   }
 
+  /**
+   * 得到 JdbcType 枚举
+   * @param alias
+   * @return
+   */
   protected JdbcType resolveJdbcType(String alias) {
     if (alias == null) {
       return null;
@@ -96,6 +128,11 @@ public abstract class BaseBuilder {
     }
   }
 
+  /**
+   * 创建别名实例
+   * @param alias
+   * @return
+   */
   protected Object createInstance(String alias) {
     Class<?> clazz = resolveClass(alias);
     if (clazz == null) {
@@ -108,6 +145,12 @@ public abstract class BaseBuilder {
     }
   }
 
+  /**
+   * 处理类的别名
+   * @param alias
+   * @param <T>
+   * @return
+   */
   protected <T> Class<? extends T> resolveClass(String alias) {
     if (alias == null) {
       return null;
@@ -119,6 +162,12 @@ public abstract class BaseBuilder {
     }
   }
 
+  /**
+   * 处理 javaType 和 typeHandlerAlias 类型处理器别名
+   * @param javaType
+   * @param typeHandlerAlias
+   * @return
+   */
   protected TypeHandler<?> resolveTypeHandler(Class<?> javaType, String typeHandlerAlias) {
     if (typeHandlerAlias == null) {
       return null;

@@ -5,6 +5,7 @@
 - SAX (Simple API for XML)解析方式 推模式 解析部分XML  
 - JDK 支持的 StAX (Streaming API for XML)解析方式 拉模式 解析部分XML 
 #### 反射
+Java 中的反射虽然功能强大,但是代码编写起来比较复杂且容易出错,为了简化反射操作的相关代码, MyBatis提供了专门的反射模块,该模块位于 org.apache.ibatis.reflection 包中,它对常见的反射操作做了进一步封装,提供了更加简洁方便的反射 API 。
 ##### Reflector
 ##### ReflectorFactory
 ##### TypeParameterResolver

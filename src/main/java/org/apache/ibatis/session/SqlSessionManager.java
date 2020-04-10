@@ -31,6 +31,11 @@ import org.apache.ibatis.reflection.ExceptionUtil;
 
 /**
  * @author Larry Meadors
+ *
+ * - `SqlSessionManager` 实现了`SqlSessionFactory`、 `SqlSession` 接口，重写了这两个接口的所有方法；
+ * - 包含两个成员变量 `sqlSessionFactory` 、 `sqlSessionProxy`，通过`newInstance()`方法调用构造方法进行赋值；
+ * - `sqlSessionProxy` 为一个代理对象，通过 `Java` 反射技术生成代理对象。
+ * - ` SqlSeesion` 接口定义了 `close()` 、 `commit()` 、 `rollback()`、`clearCache()` 等方法，为了操作同一个`SqlSeesion`对象，引入了 `ThreadLocal` 变量，通过`localSqlSession`确保操作同一个`SqlSession`，保证了线程安全。
  */
 public class SqlSessionManager implements SqlSessionFactory, SqlSession {
 
@@ -74,7 +79,7 @@ public class SqlSessionManager implements SqlSessionFactory, SqlSession {
   public static SqlSessionManager newInstance(SqlSessionFactory sqlSessionFactory) {
     return new SqlSessionManager(sqlSessionFactory);
   }
-
+  //通过此方法，对localSqlSession赋值
   public void startManagedSession() {
     this.localSqlSession.set(openSession());
   }
