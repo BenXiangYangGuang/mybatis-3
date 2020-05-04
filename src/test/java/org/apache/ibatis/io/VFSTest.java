@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Unit test for VFS getInstance method in multi-thread environment
+ * VFS 虚拟文件系统
  *
  * @author jasonleaster
  */

@@ -135,6 +135,11 @@ public class MetaClass {
     return null;
   }
 
+  /**
+   * 检查被包装类的属性值是否有Setter()方法
+   * @param name
+   * @return
+   */
   public boolean hasSetter(String name) {
     PropertyTokenizer prop = new PropertyTokenizer(name);
     if (prop.hasNext()) {

@@ -53,9 +53,10 @@ import org.apache.ibatis.type.JdbcType;
  */
 public class XMLConfigBuilder extends BaseBuilder {
 
-  private boolean parsed;
-  private final XPathParser parser;
-  private String environment;
+  private boolean parsed;  // 标识是否已经解析 mybats-config.xml 配置丈件
+  private final XPathParser parser;  //用于解析 mybatis config xml 配置文件的 XPathParser 对象
+  private String environment;   //标识＜environment＞配置的名称，默认读取＜environment> 标签的 default 属性
+  //ReflectorFactory 负责创建和缓存 Reflector 对象
   private final ReflectorFactory localReflectorFactory = new DefaultReflectorFactory();
 
   public XMLConfigBuilder(Reader reader) {
@@ -83,6 +84,7 @@ public class XMLConfigBuilder extends BaseBuilder {
   }
 
   private XMLConfigBuilder(XPathParser parser, String environment, Properties props) {
+    //configuration 初始值是 new Configuration Object
     super(new Configuration());
     ErrorContext.instance().resource("SQL Mapper Configuration");
     this.configuration.setVariables(props);
@@ -96,6 +98,7 @@ public class XMLConfigBuilder extends BaseBuilder {
       throw new BuilderException("Each XMLConfigBuilder can only be used once.");
     }
     parsed = true;
+    //在 mybatis-config xml 配置文件中查找＜configuration＞节点，并开始解析
     parseConfiguration(parser.evalNode("/configuration"));
     return configuration;
   }
@@ -105,24 +108,35 @@ public class XMLConfigBuilder extends BaseBuilder {
       //issue #117 read properties first
 
       //<properties resource="org/apache/ibatis/databases/blog/blog-derby.properties"/>
+      //解析＜properties＞节
       propertiesElement(root.evalNode("properties"));
       //  <settings>
       //    <setting name="cacheEnabled" value="true"/>
       //    <setting name="lazyLoadingEnabled" value="false"/>
       //  </settings>
+      //解析＜settings＞节点
       Properties settings = settingsAsProperties(root.evalNode("settings"));
-      loadCustomVfs(settings);
+      loadCustomVfs(settings);    // 设置 vfsimpl 字段
       loadCustomLogImpl(settings);
+      //解析＜typeAliases＞节点
       typeAliasesElement(root.evalNode("typeAliases"));
+      //解析＜plugins＞节
       pluginElement(root.evalNode("plugins"));
+      //解析＜objectFactory＞节点
       objectFactoryElement(root.evalNode("objectFactory"));
+      //解析 <objectWrapperFactory> 节点
       objectWrapperFactoryElement(root.evalNode("objectWrapperFactory"));
+      //解析＜reflectorFactory>节点
       reflectorFactoryElement(root.evalNode("reflectorFactory"));
       settingsElement(settings);
       // read it after objectFactory and objectWrapperFactory issue #631
+      //解析＜environments>节点
       environmentsElement(root.evalNode("environments"));
+      //解析＜databaseidProvider＞节点
       databaseIdProviderElement(root.evalNode("databaseIdProvider"));
+      //解析＜typeHandlers＞节点
       typeHandlerElement(root.evalNode("typeHandlers"));
+      //解析<mappers＞节点
       mapperElement(root.evalNode("mappers"));
     } catch (Exception e) {
       throw new BuilderException("Error parsing SQL Mapper Configuration. Cause: " + e, e);
@@ -135,6 +149,9 @@ public class XMLConfigBuilder extends BaseBuilder {
     }
     Properties props = context.getChildrenAsProperties();
     // Check that all settings are known to the configuration class
+    // 检查 setting 设置的参数，是否是指定的，并可被解析的
+    // 创建 Configuration 类的元信息包装类，localReflectorFactory 为 DefaultReflectorFactory 新建的对象；
+    // metaConfig 为短暂的方法生命周期对象，近在此方法中临时创建，并近存活于此方法中；
     MetaClass metaConfig = MetaClass.forClass(Configuration.class, localReflectorFactory);
     for (Object key : props.keySet()) {
       if (!metaConfig.hasSetter(String.valueOf(key))) {

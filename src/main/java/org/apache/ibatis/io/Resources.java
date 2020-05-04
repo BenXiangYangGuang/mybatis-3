@@ -32,7 +32,7 @@ import java.util.Properties;
  * @author Clinton Begin
  */
 public class Resources {
-
+  // TODO: 2020/5/3   详细了解资源加载机制
   private static ClassLoaderWrapper classLoaderWrapper = new ClassLoaderWrapper();
 
   /**
