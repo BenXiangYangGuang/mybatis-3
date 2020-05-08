@@ -27,18 +27,21 @@ import java.util.Properties;
 
 /**
  * A class to simplify access to resources through the classloader.
- * 一个通过`classloader`简化了访问资源的类
+ * 一个通过`classloader`简化了访问资源的类；资源包含 *.properties 和 *.class 文件；
+ * 包装了 ClassLoaderWrapper，对外提供方法服务；
+ *
  *
  * @author Clinton Begin
  */
 public class Resources {
-  // TODO: 2020/5/3   详细了解资源加载机制
+  // 类加载包装器，包含多个 ClassLoader
   private static ClassLoaderWrapper classLoaderWrapper = new ClassLoaderWrapper();
 
   /**
    * Charset to use when calling getResourceAsReader.
    * null means use the system default.
    */
+  // TODO: 2020/5/8 charset 使用场合
   private static Charset charset;
 
   Resources() {

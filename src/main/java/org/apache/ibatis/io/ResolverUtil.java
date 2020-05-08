@@ -26,6 +26,10 @@ import org.apache.ibatis.logging.LogFactory;
 
 /**
  * 解析器工具类
+ * ResolverUtil 可以根据指定的条件查找指定包下的类,其中使用的条件由 Test 接口表示。
+ * IsA 和 AnnotatedWith 分别实现了 Test 接口。
+ * IsA 用于检测类是否继承了指定的类或接口, AnnotatedWith 用 于检测 类是否添加了指 定 的注解。
+ *
  * <p>ResolverUtil is used to locate classes that are available in the/a class path and meet
  * arbitrary conditions. The two most common conditions are that a class implements/extends
  * another class, or that is it annotated with a specific annotation. However, through the use
@@ -72,6 +76,7 @@ public class ResolverUtil<T> {
      * Will be called repeatedly with candidate classes. Must return True if a class
      * is to be included in the results, false otherwise.
      */
+    //参数 type 是待检测的类 ,如果该类符合检测的条件,则 matches ()方法返回 true ,否则返回 false
     boolean matches(Class<?> type);
   }
 
@@ -127,12 +132,14 @@ public class ResolverUtil<T> {
   private Set<Class<? extends T>> matches = new HashSet<>();
 
   /**
+   * 查找到类的加载器
    * The ClassLoader to use when looking for classes. If null then the ClassLoader returned
    * by Thread.currentThread().getContextClassLoader() will be used.
    */
   private ClassLoader classloader;
 
   /**
+   * 被查找到符合结果的类的存储集合
    * Provides access to the classes discovered so far. If no calls have been made to
    * any of the {@code find()} methods, this set will be empty.
    *

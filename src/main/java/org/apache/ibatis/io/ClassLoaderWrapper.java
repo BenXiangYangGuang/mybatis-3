@@ -20,6 +20,14 @@ import java.net.URL;
 
 /**
  * A class to wrap access to multiple class loaders making them work as one
+ * 一个多个类加载器包装类，使多个类加载器对外像一个 ClassLoader 工作；采用 ClassLoader[] 包含 defaultClassLoader，systemClassLoader 等多个加载器，使用第一个不为 Null 的 ClassLoader
+ * Java 虚拟机中的类加载器（ ClassLoader ）负责加载来自文件系统、网络或其他来源的类文件。可以动态加载 Class 文件；
+ * 分为三类，呈现树状层级结构：启动类加载器，扩展类加载器，系统类加载器；他们的加载过程都在 ClassLoader 中完成；也可以自定义加载类，继承 ClassLoader ；
+ * 启动类加载器：主要负责加载 rt.jar 和 $JAVA_HOME/jre/lib directory；他是 JVM 的一部分，由 native code 编写；
+ * 扩展类加载器：$JAVA_HOME/lib/ext directory or any other directory mentioned in the java.ext.dirs system property.
+ * 系统类加载器：It loads files found in the classpath environment variable, -classpath or -cp command line option.
+ * Delegation Model 双亲委派加载模型
+ * Class loaders are responsible for loading Java classes during runtime dynamically to the JVM .
  *
  * @author Clinton Begin
  */
