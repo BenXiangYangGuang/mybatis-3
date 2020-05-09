@@ -188,6 +188,8 @@ public abstract class VFS {
    * resource identified by a URL.
    * 负责查找指定的资源名称列表,被ResolverUtil.find（）方法查找类文件时会调用
    *
+   * 查找指定路径下的所有文件集合
+   * 返回路径下的文件集，包含 jar 包中的路径文件
    * @param url The URL that identifies the resource to list.
    * @param forPath The path to the resource that is identified by the URL. Generally, this is the
    *            value passed to {@link #getResources(String)} to get the resource URL.
@@ -197,6 +199,8 @@ public abstract class VFS {
   protected abstract List<String> list(URL url, String forPath) throws IOException;
 
   /**
+   * 递归查找指定路径下的所有文件集合
+   * 返回路径下的文件集，包含 jar 包中的路径文件
    * Recursively list the full resource path of all the resources that are children of all the
    * resources found at the specified path.
    *
@@ -206,6 +210,7 @@ public abstract class VFS {
    */
   public List<String> list(String path) throws IOException {
     List<String> names = new ArrayList<>();
+    //根据 path 得到 URL 绝对 path 路径
     for (URL url : getResources(path)) {
       names.addAll(list(url, path));
     }
