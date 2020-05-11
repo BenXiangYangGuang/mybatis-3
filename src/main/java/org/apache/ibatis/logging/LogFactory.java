@@ -18,6 +18,8 @@ package org.apache.ibatis.logging;
 import java.lang.reflect.Constructor;
 
 /**
+ * 日志工厂，决定使用哪一个第三方日志
+ * mybatis 采用适配器模式，适配了 slf4j，log4j 等多个日志框架；
  * @author Clinton Begin
  * @author Eduardo Macarron
  */
@@ -28,9 +30,10 @@ public final class LogFactory {
    */
   public static final String MARKER = "MYBATIS";
 
-  private static Constructor<? extends Log> logConstructor;
-
+  private static Constructor<? extends Log> logConstructor; // 记录当前使用的第三方日志组件所对应的适配器的构造方法
+  // 以此从上之下，尝试初始化第三方日志模块，直到 logConstructor ！= null
   static {
+    // 函数式接口，执行顺序 tryImplementation，然后执行 函数表达式，再执行函数表达式中的 setImplementation()
     tryImplementation(LogFactory::useSlf4jLogging);
     tryImplementation(LogFactory::useCommonsLogging);
     tryImplementation(LogFactory::useLog4J2Logging);
@@ -43,10 +46,20 @@ public final class LogFactory {
     // disable construction
   }
 
+  /**
+   * 返回 log 对象
+   * @param aClass 使用 log 对象的类名称
+   * @return
+   */
   public static Log getLog(Class<?> aClass) {
     return getLog(aClass.getName());
   }
 
+  /**
+   * 根据一个类名称，返回一个 Log 对象
+   * @param logger
+   * @return
+   */
   public static Log getLog(String logger) {
     try {
       return logConstructor.newInstance(logger);
@@ -87,9 +100,16 @@ public final class LogFactory {
     setImplementation(org.apache.ibatis.logging.nologging.NoLoggingImpl.class);
   }
 
+  /**
+   * 如果 logConstructor == null，就不会再执行 run(),
+   * 在 本类上面 static 代码块，会多次调用这个方法，根据调用顺序优先级，只会初始化一个 logConstructor，logConstructor 只会被一个三方日志中的一个初始化。
+   * @param runnable 作为 java8 的新特性，函数式接口；和 Thread 没有半毛钱关系；
+   *
+   */
   private static void tryImplementation(Runnable runnable) {
     if (logConstructor == null) {
       try {
+        // run() 函数式接口中方法的执行，比如这个 LogFactory::useSlf4jLogging lambda 表达式
         runnable.run();
       } catch (Throwable t) {
         // ignore
@@ -99,7 +119,9 @@ public final class LogFactory {
 
   private static void setImplementation(Class<? extends Log> implClass) {
     try {
+      //  三方日志的带有 String 参数的构造器，通过构造器创建 log 实例，并 赋值给 logConstructor
       Constructor<? extends Log> candidate = implClass.getConstructor(String.class);
+      // LogFactory.class.getName() 仅作为 log 具体实现类中构造函数的参数；
       Log log = candidate.newInstance(LogFactory.class.getName());
       if (log.isDebugEnabled()) {
         log.debug("Logging initialized using '" + implClass + "' adapter.");

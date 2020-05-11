@@ -19,6 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
+ * 适配器，实现了目标接口 Log，并把 log 接口实例，作为成员对象
  * @author Clinton Begin
  */
 public class JakartaCommonsLoggingImpl implements org.apache.ibatis.logging.Log {
