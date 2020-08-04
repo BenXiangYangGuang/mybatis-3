@@ -35,6 +35,12 @@ import org.apache.ibatis.io.Resources;
 /**
  * MyBatis 将 SQL 语句中别名的概念进行了延伸和扩展 , MyBatis
  * 可以为一个类添加一个别名,之后就可以通过别名引用该类。
+ *
+ * <typeAliases>
+ *     <typeAlias alias="Author" type="org.apache.ibatis.domain.blog.Author"/>
+ *     <typeAlias alias="Blog" type="org.apache.ibatis.domain.blog.Blog"/>
+ *   </typeAliases>
+ *
  * @author Clinton Begin
  */
 public class TypeAliasRegistry {
@@ -136,7 +142,7 @@ public class TypeAliasRegistry {
     for (Class<?> type : typeSet) {
       // Ignore inner classes and interfaces (including package-info.java)
       // Skip also inner classes. See issue #6
-      // 过滤掉略内部类 、接 口 以及抽象类
+      // 过滤掉略内部类 、接口 以及抽象类
       if (!type.isAnonymousClass() && !type.isInterface() && !type.isMemberClass()) {
         registerAlias(type);
       }

@@ -49,6 +49,7 @@ import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 
 /**
+ * mapper 文件解析器
  * @author Clinton Begin
  * @author Kazuki Shimizu
  */
@@ -88,7 +89,9 @@ public class XMLMapperBuilder extends BaseBuilder {
     this.sqlFragments = sqlFragments;
     this.resource = resource;
   }
-
+  /**
+   * 解析 mappers 中 mapper 节点
+   */
   public void parse() {
     if (!configuration.isResourceLoaded(resource)) {
       configurationElement(parser.evalNode("/mapper"));

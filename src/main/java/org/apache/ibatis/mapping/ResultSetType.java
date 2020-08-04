@@ -20,6 +20,7 @@ import java.sql.ResultSet;
 /**
  * @author Clinton Begin
  * 参考：https://www.iteye.com/blog/zhenkm0507-560109
+ * 表示结果集类型
  */
 public enum ResultSetType {
   /**

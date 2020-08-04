@@ -32,7 +32,7 @@ import org.apache.ibatis.type.TypeHandlerRegistry;
  * `BaseBuilder` 是一个基础抽象类，定义了一些通用方法，有多个具体实现类；解决 `typeAlias` 类型别名，及找到别名相应的`TypeHandler`类型处理器；还有一些简单的工具方法；
  * `Configuration` mybatis 全局配置对象；
  * `TypeAliasRegistry` 类型别名注册中心，处理各种类型别名；在 mybatis-config xml 配置文件中可以使用＜typeAliases ＞标签定义别名
- * `TypeHandlerRegistry` 类型处理器注册中心，处理各种TypeHandler，包含别名类型处理器；在 mybatis-config.xml 配置文件中可以使用＜ ypeHandlers ＞标签添加自定义 Type Handler 器；
+ * `TypeHandlerRegistry` 类型处理器注册中心，处理各种TypeHandler，包含别名类型处理器；在 mybatis-config.xml 配置文件中可以使用＜ typeHandlers ＞标签添加自定义 Type Handler 器；
  * @author Clinton Begin
  */
 public abstract class BaseBuilder {
@@ -89,6 +89,8 @@ public abstract class BaseBuilder {
     value = value == null ? defaultValue : value;
     return new HashSet<>(Arrays.asList(value.split(",")));
   }
+
+  //resolveJdbcType、resolveResultSetType、resolveParameterMode 将 String 转换成对应的枚举对象
 
   /**
    * 得到 JdbcType 枚举

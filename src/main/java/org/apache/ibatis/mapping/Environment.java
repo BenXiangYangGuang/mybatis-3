@@ -20,6 +20,7 @@ import javax.sql.DataSource;
 import org.apache.ibatis.transaction.TransactionFactory;
 
 /**
+ * 在实际生产中 ，同一项目可能分为开发、 测试和生产 个不同的环境，每个环境的配置可能也不尽相同。
  * @author Clinton Begin
  */
 public final class Environment {

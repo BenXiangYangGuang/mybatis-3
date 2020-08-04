@@ -116,6 +116,7 @@ public class XMLConfigBuilder extends BaseBuilder {
       //  </settings>
       //解析＜settings＞节点
       Properties settings = settingsAsProperties(root.evalNode("settings"));
+      // TODO: 2020/8/4  vfs 虚拟文件系统
       loadCustomVfs(settings);    // 设置 vfsimpl 字段
       loadCustomLogImpl(settings);
       //解析＜typeAliases＞节点
@@ -128,6 +129,7 @@ public class XMLConfigBuilder extends BaseBuilder {
       objectWrapperFactoryElement(root.evalNode("objectWrapperFactory"));
       //解析＜reflectorFactory>节点
       reflectorFactoryElement(root.evalNode("reflectorFactory"));
+      // 解析各种设置，在 mybatis 环境中生效
       settingsElement(settings);
       // read it after objectFactory and objectWrapperFactory issue #631
       //解析＜environments>节点
@@ -142,7 +144,8 @@ public class XMLConfigBuilder extends BaseBuilder {
       throw new BuilderException("Error parsing SQL Mapper Configuration. Cause: " + e, e);
     }
   }
-
+  // 检测 setting 属性是否是 Configuration 中指定的，包含 setter 方法， 就是指定的 Configuration 属性
+  // 使用 MetaClass 检测 key 定的属性在 configuration 类中是否有对应 setter 方法的步骤。
   private Properties settingsAsProperties(XNode context) {
     if (context == null) {
       return new Properties();
@@ -152,6 +155,7 @@ public class XMLConfigBuilder extends BaseBuilder {
     // 检查 setting 设置的参数，是否是指定的，并可被解析的
     // 创建 Configuration 类的元信息包装类，localReflectorFactory 为 DefaultReflectorFactory 新建的对象；
     // metaConfig 为短暂的方法生命周期对象，近在此方法中临时创建，并近存活于此方法中；
+    // 检测 Configuration 是否定义了 key 指定属性相应的 setter 方法
     MetaClass metaConfig = MetaClass.forClass(Configuration.class, localReflectorFactory);
     for (Object key : props.keySet()) {
       if (!metaConfig.hasSetter(String.valueOf(key))) {
@@ -179,20 +183,31 @@ public class XMLConfigBuilder extends BaseBuilder {
     Class<? extends Log> logImpl = resolveClass(props.getProperty("logImpl"));
     configuration.setLogImpl(logImpl);
   }
-
+ /**
+  * 解析类的别名
+   <typeAliases>
+    <typeAlias alias="BlogAuthor" type="org.apache.ibatis.domain.blog.Author"/>
+    <typeAlias type="org.apache.ibatis.domain.blog.Blog"/>
+    <typeAlias type="org.apache.ibatis.domain.blog.Post"/>
+    <package name="org.apache.ibatis.domain.jpetstore"/>
+  </typeAliases>
+  */
   private void typeAliasesElement(XNode parent) {
     if (parent != null) {
       for (XNode child : parent.getChildren()) {
+        // 如果包含 package,解析 package 下类,进行别名注册
+        // 处理＜package ＞节点
         if ("package".equals(child.getName())) {
           String typeAliasPackage = child.getStringAttribute("name");
+          // 通过 TypeAliasRegistry 扫描指定包中所有的类，并解析＠Alias 注解，完成别名注册
           configuration.getTypeAliasRegistry().registerAliases(typeAliasPackage);
         } else {
-          String alias = child.getStringAttribute("alias");
-          String type = child.getStringAttribute("type");
+          String alias = child.getStringAttribute("alias");  // 获取指定的别名
+          String type = child.getStringAttribute("type");    // 获取别名对应的类型
           try {
             Class<?> clazz = Resources.classForName(type);
             if (alias == null) {
-              typeAliasRegistry.registerAlias(clazz);
+              typeAliasRegistry.registerAlias(clazz); // 扫描 @Alias 完成注册 ，完成注册
             } else {
               typeAliasRegistry.registerAlias(alias, clazz);
             }
@@ -204,25 +219,49 @@ public class XMLConfigBuilder extends BaseBuilder {
     }
   }
 
+  // 以通过添加自定义插件在 SQL 语句执行过程中的某点进行拦截。 MyBatis 中的自定义插件只需实现 Interceptor 接口，并通过注解指定想
+  // 要拦截的方法签名即可
+
+  /**
+   * <plugins>
+   *   <plugin interceptor="org.apache.ibatis.builder.ExamplePlugin">
+   *      <property name="pluginProperty" value="100"/>
+   *   </plugin>
+   *  </plugins>
+   * @param parent
+   * @throws Exception
+   */
   private void pluginElement(XNode parent) throws Exception {
     if (parent != null) {
       for (XNode child : parent.getChildren()) {
         String interceptor = child.getStringAttribute("interceptor");
         Properties properties = child.getChildrenAsProperties();
+        // 创建插件实例,插件是 Interceptor 的具体实现
         Interceptor interceptorInstance = (Interceptor) resolveClass(interceptor).getDeclaredConstructor().newInstance();
+        // 设置插件的属性
         interceptorInstance.setProperties(properties);
+        // 设置插件到拦截器链中
         configuration.addInterceptor(interceptorInstance);
       }
     }
   }
 
+  /**
+   *  <objectFactory type="org.apache.ibatis.builder.ExampleObjectFactory">
+   *    <property name="objectFactoryProperty" value="100"/>
+   *  </objectFactory>
+   * @param context
+   * @throws Exception
+   */
+  // 解析 objectFactory 节点, objectFactory 创建对象的工厂
+  // 可以通过添加自定义 ObjectFactory 实现类、ObjectWrapperFactory 实现类、ReflectorFactory 实现类对 Mybatis 进行扩展
   private void objectFactoryElement(XNode context) throws Exception {
     if (context != null) {
       String type = context.getStringAttribute("type");
       Properties properties = context.getChildrenAsProperties();
-      ObjectFactory factory = (ObjectFactory) resolveClass(type).getDeclaredConstructor().newInstance();
-      factory.setProperties(properties);
-      configuration.setObjectFactory(factory);
+      ObjectFactory factory = (ObjectFactory) resolveClass(type).getDeclaredConstructor().newInstance(); // 创建 objectFactory 对象
+      factory.setProperties(properties);  // 设置对象属性
+      configuration.setObjectFactory(factory); // 反写 configuration 对象中的 objectFactory 属性
     }
   }
 
@@ -257,11 +296,13 @@ public class XMLConfigBuilder extends BaseBuilder {
       } else if (url != null) {
         defaults.putAll(Resources.getUrlAsProperties(url));
       }
+
+      // ．．．与 Configurat on 对象中 variables 集合合并（略）
       Properties vars = configuration.getVariables();
       if (vars != null) {
         defaults.putAll(vars);
       }
-      //设置 解析器 variables
+      //设置 解析器 variables; 在后面的解析过程中，会使用该 Properties 对象中的信息替换占位符。
       parser.setVariables(defaults);
       //更新 configuration 的 variables 变量
       configuration.setVariables(defaults);
@@ -297,32 +338,57 @@ public class XMLConfigBuilder extends BaseBuilder {
     configuration.setConfigurationFactory(resolveClass(props.getProperty("configurationFactory")));
   }
 
+  /**
+   * <environments default="development">
+   *     <environment id="development">
+   *       <transactionManager type="JDBC">
+   *         <property name="" value="" />
+   *       </transactionManager>
+   *       <dataSource type="UNPOOLED">
+   *         <property name="driver" value="org.hsqldb.jdbcDriver" />
+   *         <property name="url" value="jdbc:hsqldb:mem:localtime" />
+   *         <property name="username" value="sa" />
+   *       </dataSource>
+   *     </environment>
+   *   </environments>
+   *
+   * @param context
+   * @throws Exception
+   */
   private void environmentsElement(XNode context) throws Exception {
     if (context != null) {
+      //未指定 XMLConfigBuilder environment 字段，则使用 default 性指定的 <environment>
       if (environment == null) {
         environment = context.getStringAttribute("default");
       }
       for (XNode child : context.getChildren()) {
         String id = child.getStringAttribute("id");
         if (isSpecifiedEnvironment(id)) {
-          TransactionFactory txFactory = transactionManagerElement(child.evalNode("transactionManager"));
-          DataSourceFactory dsFactory = dataSourceElement(child.evalNode("dataSource"));
-          DataSource dataSource = dsFactory.getDataSource();
+          TransactionFactory txFactory = transactionManagerElement(child.evalNode("transactionManager")); // 创建 TransactionFactory
+          DataSourceFactory dsFactory = dataSourceElement(child.evalNode("dataSource")); // 创建 DataSourceFactory
+          DataSource dataSource = dsFactory.getDataSource();        // 创建 DataSource
           Environment.Builder environmentBuilder = new Environment.Builder(id)
               .transactionFactory(txFactory)
               .dataSource(dataSource);
-          configuration.setEnvironment(environmentBuilder.build());
+          configuration.setEnvironment(environmentBuilder.build()); // 创建 Environment,并反写 configuration 对象
         }
       }
     }
   }
 
+  /**
+   *   <databaseIdProvider type="DB_VENDOR">
+   *     <property name="Apache Derby" value="derby"/>
+   *   </databaseIdProvider>
+   * @param context
+   * @throws Exception
+   */
   private void databaseIdProviderElement(XNode context) throws Exception {
     DatabaseIdProvider databaseIdProvider = null;
     if (context != null) {
       String type = context.getStringAttribute("type");
       // awful patch to keep backward compatibility
-      if ("VENDOR".equals(type)) {
+      if ("VENDOR".equals(type)) {  // 为了保证兼容性，修改 type 取值
         type = "DB_VENDOR";
       }
       Properties properties = context.getChildrenAsProperties();
@@ -331,11 +397,18 @@ public class XMLConfigBuilder extends BaseBuilder {
     }
     Environment environment = configuration.getEnvironment();
     if (environment != null && databaseIdProvider != null) {
+      // 根据前面确定的 DataSource 确定当前使用的数据库产品,得到不同厂商数据库Id
       String databaseId = databaseIdProvider.getDatabaseId(environment.getDataSource());
       configuration.setDatabaseId(databaseId);
     }
   }
 
+  /**
+   * 根据 配置文件中的节点，创建 TransactionFactory 对象
+   * @param context
+   * @return
+   * @throws Exception
+   */
   private TransactionFactory transactionManagerElement(XNode context) throws Exception {
     if (context != null) {
       String type = context.getStringAttribute("type");
@@ -347,6 +420,12 @@ public class XMLConfigBuilder extends BaseBuilder {
     throw new BuilderException("Environment declaration requires a TransactionFactory.");
   }
 
+  /**
+   * 根据 配置文件中的节点，创建 DataSourceFactory 对象
+   * @param context
+   * @return
+   * @throws Exception
+   */
   private DataSourceFactory dataSourceElement(XNode context) throws Exception {
     if (context != null) {
       String type = context.getStringAttribute("type");
@@ -385,16 +464,30 @@ public class XMLConfigBuilder extends BaseBuilder {
     }
   }
 
+  /**
+   * 解析实体 mapper 文件；
+   *   <mappers>
+   *     <mapper resource="org/apache/ibatis/builder/BlogMapper.xml"/>
+   *     <mapper url="file:./src/test/java/org/apache/ibatis/builder/NestedBlogMapper.xml"/>
+   *     <mapper class="org.apache.ibatis.builder.CachedAuthorMapper"/>
+   *     <package name="org.apache.ibatis.builder.mapper"/>
+   *   </mappers>
+   * @param parent
+   * @throws Exception
+   */
   private void mapperElement(XNode parent) throws Exception {
     if (parent != null) {
       for (XNode child : parent.getChildren()) {
-        if ("package".equals(child.getName())) {
+        if ("package".equals(child.getName())) { // <package ＞子节点
           String mapperPackage = child.getStringAttribute("name");
           configuration.addMappers(mapperPackage);
         } else {
+          // 获取＜mapper ＞节点的 resource url class 属性，这三个属性互斥
           String resource = child.getStringAttribute("resource");
           String url = child.getStringAttribute("url");
           String mapperClass = child.getStringAttribute("class");
+          // 如果＜mapper ＞节点指定了 resource 或是 url 属性，则创建 XMLMapperBuilder 对象
+          // 并通过该对象解析 resource 或是 url 属性指定的 Mapper 配置文件
           if (resource != null && url == null && mapperClass == null) {
             ErrorContext.instance().resource(resource);
             InputStream inputStream = Resources.getResourceAsStream(resource);
@@ -404,8 +497,10 @@ public class XMLConfigBuilder extends BaseBuilder {
             ErrorContext.instance().resource(url);
             InputStream inputStream = Resources.getUrlAsStream(url);
             XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, url, configuration.getSqlFragments());
+            // 解析 mapper 节点
             mapperParser.parse();
           } else if (resource == null && url == null && mapperClass != null) {
+            // 如果＜mapper＞节点指定了 class 属性，则 MapperRegistry 注册该 Mapper 接口
             Class<?> mapperInterface = Resources.classForName(mapperClass);
             configuration.addMapper(mapperInterface);
           } else {
@@ -416,6 +511,11 @@ public class XMLConfigBuilder extends BaseBuilder {
     }
   }
 
+  /**
+   * 检测是否是，指定的环境
+   * @param id
+   * @return
+   */
   private boolean isSpecifiedEnvironment(String id) {
     if (environment == null) {
       throw new BuilderException("No environment specified.");

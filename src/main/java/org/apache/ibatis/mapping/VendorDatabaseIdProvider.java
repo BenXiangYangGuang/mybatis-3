@@ -28,7 +28,7 @@ import org.apache.ibatis.logging.LogFactory;
 
 /**
  * Vendor DatabaseId provider.
- *
+ * 数据库厂商提供者 Id
  * It returns database product name as a databaseId.
  * If the user provides a properties it uses it to translate database product name
  * key="Microsoft SQL Server", value="ms" will return "ms".
@@ -59,9 +59,19 @@ public class VendorDatabaseIdProvider implements DatabaseIdProvider {
     this.properties = p;
   }
 
+  /**
+   * 先解析 DataSource 所连接的数据库产品名称，之后根据＜databaseIdProvider＞节点配置的数据库产品名
+   * 称与 databaseId 的对应关系确定最终 databaseId
+   * @param dataSource
+   * @return
+   * @throws SQLException
+   */
   private String getDatabaseName(DataSource dataSource) throws SQLException {
+    // ／解析 DataSource 连接的数据库产品的名称
     String productName = getDatabaseProductName(dataSource);
     if (this.properties != null) {
+      //根据＜databasedProvider＞子节点自己置的数据库产品和 databaseId 之间对应关系，确定最终
+      //使用的 databaseId
       for (Map.Entry<Object, Object> property : properties.entrySet()) {
         if (productName.contains((String) property.getKey())) {
           return (String) property.getValue();
@@ -73,6 +83,12 @@ public class VendorDatabaseIdProvider implements DatabaseIdProvider {
     return productName;
   }
 
+  /**
+   * 根据 connection 连接,获取数据库产品名称
+   * @param dataSource
+   * @return
+   * @throws SQLException
+   */
   private String getDatabaseProductName(DataSource dataSource) throws SQLException {
     Connection con = null;
     try {

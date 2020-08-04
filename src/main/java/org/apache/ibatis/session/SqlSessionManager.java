@@ -79,7 +79,8 @@ public class SqlSessionManager implements SqlSessionFactory, SqlSession {
   public static SqlSessionManager newInstance(SqlSessionFactory sqlSessionFactory) {
     return new SqlSessionManager(sqlSessionFactory);
   }
-  //通过此方法，对localSqlSession赋值
+  //通过此方法，对localSqlSession赋值;
+  //其他框架和 mybatis 进行对接的时候，不会使用 SqlSessionManager 类，所以这个 localSqlSession 的线程缓存也没有被使用
   public void startManagedSession() {
     this.localSqlSession.set(openSession());
   }

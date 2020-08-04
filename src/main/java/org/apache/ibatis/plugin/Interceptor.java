@@ -18,6 +18,7 @@ package org.apache.ibatis.plugin;
 import java.util.Properties;
 
 /**
+ * 注册插件，通过拦截器使插件生效
  * @author Clinton Begin
  */
 public interface Interceptor {
