@@ -25,7 +25,11 @@ import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
 
 /**
- * 解析器工具类
+ * 根据指定的包路径和条件查找相应的类，并加载
+ * ResolverUtil 可以根据指定的条件查找指定包下的类,其中使用的条件由 Test 接口表示。
+ * IsA 和 AnnotatedWith 分别实现了 Test 接口。
+ * IsA 用于检测类是否继承了指定的类或接口, AnnotatedWith 用 于检测 类是否添加了指定的注解。
+ *
  * <p>ResolverUtil is used to locate classes that are available in the/a class path and meet
  * arbitrary conditions. The two most common conditions are that a class implements/extends
  * another class, or that is it annotated with a specific annotation. However, through the use
@@ -64,6 +68,7 @@ public class ResolverUtil<T> {
   private static final Log log = LogFactory.getLog(ResolverUtil.class);
 
   /**
+   * 实现查找条件的接口，matches() 为检测条件表达式
    * A simple interface that specifies how to test classes to determine if they
    * are to be included in the results produced by the ResolverUtil.
    */
@@ -72,10 +77,12 @@ public class ResolverUtil<T> {
      * Will be called repeatedly with candidate classes. Must return True if a class
      * is to be included in the results, false otherwise.
      */
+    //参数 type 是待检测的类 ,如果该类符合检测的条件,则 matches ()方法返回 true ,否则返回 false
     boolean matches(Class<?> type);
   }
 
   /**
+   * 检测一个类，是否是指定类的子类；
    * A Test that checks to see if each class is assignable to the provided class. Note
    * that this test will match the parent type itself if it is presented for matching.
    */
@@ -100,6 +107,7 @@ public class ResolverUtil<T> {
   }
 
   /**
+   * 检测一个类是否带有注解
    * A Test that checks to see if each class is annotated with a specific annotation. If it
    * is, then the test returns true, otherwise false.
    */
@@ -127,12 +135,14 @@ public class ResolverUtil<T> {
   private Set<Class<? extends T>> matches = new HashSet<>();
 
   /**
+   * 查找到类的加载器
    * The ClassLoader to use when looking for classes. If null then the ClassLoader returned
    * by Thread.currentThread().getContextClassLoader() will be used.
    */
   private ClassLoader classloader;
 
   /**
+   * 被查找到符合结果的类的存储集合
    * Provides access to the classes discovered so far. If no calls have been made to
    * any of the {@code find()} methods, this set will be empty.
    *
@@ -163,6 +173,7 @@ public class ResolverUtil<T> {
   }
 
   /**
+   * 查找一个类是否继承了 parent
    * Attempts to discover classes that are assignable to the type provided. In the case
    * that an interface is provided this method will collect implementations. In the case
    * of a non-interface class, subclasses will be collected.  Accumulated classes can be
@@ -185,6 +196,7 @@ public class ResolverUtil<T> {
   }
 
   /**
+   * 查找一个类，是否带有指定注解
    * Attempts to discover classes that are annotated with the annotation. Accumulated
    * classes can be accessed by calling {@link #getClasses()}.
    *
@@ -205,6 +217,7 @@ public class ResolverUtil<T> {
   }
 
   /**
+   * 根据包名称查找所有的类，并判定是否满足条件
    * Scans for classes starting at the package provided and descending into subpackages.
    * Each class is offered up to the Test as it is discovered, and if the Test returns
    * true the class is retained.  Accumulated classes can be fetched by calling
@@ -218,6 +231,7 @@ public class ResolverUtil<T> {
     String path = getPackagePath(packageName);
 
     try {
+      //返回路径下的文件集，包含 jar 包中的路径文件
       List<String> children = VFS.getInstance().list(path);
       for (String child : children) {
         if (child.endsWith(".class")) {
@@ -242,6 +256,7 @@ public class ResolverUtil<T> {
   }
 
   /**
+   * 检测一个类是否满足表达式，并添加到 matches 集合
    * Add the class designated by the fully qualified class name provided to the set of
    * resolved classes if and only if it is approved by the Test supplied.
    *

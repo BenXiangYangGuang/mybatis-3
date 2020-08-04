@@ -49,7 +49,19 @@ public class DefaultVFS extends VFS {
   public boolean isValid() {
     return true;
   }
-
+// TODO: 2020/5/9 以后详细查看
+  /**
+   *
+   * 返回结果
+   * 0 = "org/apache/ibatis/io/ClassLoaderWrapperTest.class"
+   * 2 = "org/apache/ibatis/io/mybatis-3.5.4-SNAPSHOT.jar" //此条为临时增加文件
+   * 1 = "org/apache/ibatis/io/ExternalResourcesTest.class"
+   *
+   * @param url The URL that identifies the resource to list. file:/home/wewe/IdeaProject/self/mybatis-3/target/test-classes/org/apache/ibatis/io
+   * @param path org/apache/ibatis/io
+   * @return
+   * @throws IOException
+   */
   @Override
   public List<String> list(URL url, String path) throws IOException {
     InputStream is = null;
@@ -65,7 +77,7 @@ public class DefaultVFS extends VFS {
         if (log.isDebugEnabled()) {
           log.debug("Listing " + url);
         }
-        // 边历 Jar 中的 资源 ，并返回以 path 开头的资源列表
+        // 边历 Jar 中的资源 ，并返回以 path 开头的资源列表
         resources = listResources(new JarInputStream(is), path);
       }
       else {
@@ -149,6 +161,7 @@ public class DefaultVFS extends VFS {
         }
 
         // Iterate over immediate children, adding files and recursing into directories
+        //遥历 children 集合,递归查找符合条件的资源名称
         for (String child : children) {
           String resourcePath = path + "/" + child;
           resources.add(resourcePath);
@@ -180,6 +193,7 @@ public class DefaultVFS extends VFS {
    */
   protected List<String> listResources(JarInputStream jar, String path) throws IOException {
     // Include the leading and trailing slash when matching names
+    //...如果 path 不是以”/”开始和结束,则在其开始和结束位置添加”/”(略)
     if (!path.startsWith("/")) {
       path = "/" + path;
     }
@@ -188,17 +202,20 @@ public class DefaultVFS extends VFS {
     }
 
     // Iterate over the entries and collect those that begin with the requested path
+    //遍历整个 Jar 包,将以 path 开头的资源记录到 resources 集合中并返回
     List<String> resources = new ArrayList<>();
     for (JarEntry entry; (entry = jar.getNextJarEntry()) != null;) {
       if (!entry.isDirectory()) {
         // Add leading slash if it's missing
         StringBuilder name = new StringBuilder(entry.getName());
+        // ... 如果 name 不是以”/”开头,则为其添加”/”(略)
         if (name.charAt(0) != '/') {
           name.insert(0, '/');
         }
 
         // Check file name
-        if (name.indexOf(path) == 0) {
+
+        if (name.indexOf(path) == 0) {      //检测 name 是否以 path 开头
           if (log.isDebugEnabled()) {
             log.debug("Found resource: " + name);
           }
@@ -299,6 +316,7 @@ public class DefaultVFS extends VFS {
   }
 
   /**
+   * 转换一个包路径为，一个文件路径
    * Converts a Java package name to a path that can be looked up with a call to
    * {@link ClassLoader#getResources(String)}.
    *
@@ -318,6 +336,8 @@ public class DefaultVFS extends VFS {
   }
 
   /**
+   * 判断一个 URL 是否指向 jar 包，是返回 true，否则 false；
+   * 根据 jar 开头的魔数，进行判断
    * Returns true if the resource located at the given URL is a JAR file.
    *
    * @param url The URL of the resource to test.

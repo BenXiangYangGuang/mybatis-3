@@ -42,7 +42,9 @@ class LogFactoryTest {
 
   @Test
   void shouldUseLog4J() {
+    // 设置 Log4J作为日志
     LogFactory.useLog4JLogging();
+    // 得到记录类的 log 对象
     Log log = LogFactory.getLog(Object.class);
     logSomething(log);
     assertEquals(log.getClass().getName(), Log4jImpl.class.getName());

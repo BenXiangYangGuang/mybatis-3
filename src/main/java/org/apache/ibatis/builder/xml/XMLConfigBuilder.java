@@ -92,7 +92,7 @@ public class XMLConfigBuilder extends BaseBuilder {
     this.environment = environment;
     this.parser = parser;
   }
-
+  // 解析 mybatis-config 文件，并返回全局 Configuration 对象
   public Configuration parse() {
     if (parsed) {
       throw new BuilderException("Each XMLConfigBuilder can only be used once.");
