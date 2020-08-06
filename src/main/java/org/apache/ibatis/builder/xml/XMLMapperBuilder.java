@@ -58,7 +58,7 @@ public class XMLMapperBuilder extends BaseBuilder {
   private final XPathParser parser;
   private final MapperBuilderAssistant builderAssistant;
   private final Map<String, XNode> sqlFragments;
-  private final String resource;
+  private final String resource;  // mapper 文件路径 org/apache/ibatis/builder/BlogMapper.xml
 
   @Deprecated
   public XMLMapperBuilder(Reader reader, Configuration configuration, String resource, Map<String, XNode> sqlFragments, String namespace) {
@@ -82,6 +82,13 @@ public class XMLMapperBuilder extends BaseBuilder {
         configuration, resource, sqlFragments);
   }
 
+  /**
+   *
+   * @param parser
+   * @param configuration
+   * @param resource mapper 文件的位置
+   * @param sqlFragments configuration 中的 sqlFragments
+   */
   private XMLMapperBuilder(XPathParser parser, Configuration configuration, String resource, Map<String, XNode> sqlFragments) {
     super(configuration);
     this.builderAssistant = new MapperBuilderAssistant(configuration, resource);
@@ -93,34 +100,42 @@ public class XMLMapperBuilder extends BaseBuilder {
    * 解析 mappers 中 mapper 节点
    */
   public void parse() {
+    // 判断这个 mapper 是否已经被加载
     if (!configuration.isResourceLoaded(resource)) {
-      configurationElement(parser.evalNode("/mapper"));
-      configuration.addLoadedResource(resource);
-      bindMapperForNamespace();
+      configurationElement(parser.evalNode("/mapper")); // mapper 文件中的 <mapper> 节点
+      configuration.addLoadedResource(resource); // 已经解析，添加这个 mapper.xml 到资源已经解析集合
+      bindMapperForNamespace(); //注册 Mapper 接口
     }
+    // pending 即将发生的
 
-    parsePendingResultMaps();
-    parsePendingCacheRefs();
-    parsePendingStatements();
+    parsePendingResultMaps(); //处理 configurationElement() 方法中解析失败的 <resultMap> 节点
+    parsePendingCacheRefs();  //处理 configurationElement() 方法中解析失败的 <cache-ref> 节点
+    parsePendingStatements(); //处理 configurationElement() 方法中解析失败的 SQL 语句节点
   }
 
   public XNode getSqlFragment(String refid) {
     return sqlFragments.get(refid);
   }
 
+  /**
+   * 解析 mapper 文件的各个节点
+   * @param context
+   */
   private void configurationElement(XNode context) {
     try {
+      // 获取<mapper> 中的 <mapper namespace="org.apache.ibatis.domain.blog.mappers.AuthorMapper">
       String namespace = context.getStringAttribute("namespace");
       if (namespace == null || namespace.equals("")) {
         throw new BuilderException("Mapper's namespace cannot be empty");
       }
+      // 设置 MapperBuilderAssistant 的 currentNamespce 字段,记录当前命名空间
       builderAssistant.setCurrentNamespace(namespace);
-      cacheRefElement(context.evalNode("cache-ref"));
-      cacheElement(context.evalNode("cache"));
-      parameterMapElement(context.evalNodes("/mapper/parameterMap"));
-      resultMapElements(context.evalNodes("/mapper/resultMap"));
-      sqlElement(context.evalNodes("/mapper/sql"));
-      buildStatementFromContext(context.evalNodes("select|insert|update|delete"));
+      cacheRefElement(context.evalNode("cache-ref"));  //解析 <cache-ref> 节点
+      cacheElement(context.evalNode("cache"));       //解析 <cache> 节点
+      parameterMapElement(context.evalNodes("/mapper/parameterMap"));   //解析 <mapper> 下的 <parameterMap> 节点 （该节点 废弃，不再推荐使用，不做详细介绍）
+      resultMapElements(context.evalNodes("/mapper/resultMap"));  //解析 <mapper> 下的 <resultMap> 节点
+      sqlElement(context.evalNodes("/mapper/sql"));  //解析 <mapper> 下的 <sql> 节点
+      buildStatementFromContext(context.evalNodes("select|insert|update|delete")); //解析 <mapper> 下的 <select|insert|update|delete> 节点
     } catch (Exception e) {
       throw new BuilderException("Error parsing Mapper XML. The XML location is '" + resource + "'. Cause: " + e, e);
     }
@@ -201,21 +216,49 @@ public class XMLMapperBuilder extends BaseBuilder {
     }
   }
 
+  /**
+   * 解析 <cache> 节点
+   * MyBatis 有非常强大的二级缓存功能， 功能可以非常方便地进行配置， MyBatis 默认情
+   * 况下没有开启二级缓存，如果要为某命名空间开启 二级缓存功能，则需要在相应映射配置文件
+   * 中添加＜cache＞节点，还可以通过配置＜cache＞节点 的相关属性，为二级缓存配置相应的特性 （本
+   * 质上就是添加相应的装饰器〉。
+   * @param context
+   */
   private void cacheElement(XNode context) {
     if (context != null) {
+      // 缓存类型
       String type = context.getStringAttribute("type", "PERPETUAL");
+      // 查找 type 属性对应的 Cache 接口实现
       Class<? extends Cache> typeClass = typeAliasRegistry.resolveAlias(type);
+      // eviction 驱逐,赶出
+      // 缓存策略
       String eviction = context.getStringAttribute("eviction", "LRU");
+      // 查找 eviction 属性对应的 Cache 接口实现
       Class<? extends Cache> evictionClass = typeAliasRegistry.resolveAlias(eviction);
+      // 刷新间隔
       Long flushInterval = context.getLongAttribute("flushInterval");
+      //获取＜cache＞节点的 size 属性，默认位是 null
       Integer size = context.getIntAttribute("size");
+      //获取＜cache＞节点的 readOnly 属性，默认位是 false
       boolean readWrite = !context.getBooleanAttribute("readOnly", false);
+      //获取＜cache＞节点的 blocking 属性，默认位是 false
       boolean blocking = context.getBooleanAttribute("blocking", false);
+      // 获取<cache> 节点下的子节点,用于初始化二级缓存
+      //	<cache type="org.apache.ibatis.submitted.global_variables.CustomCache">
+      //    <property name="stringValue" value="${stringProperty}"/>
+      //    <property name="integerValue" value="${integerProperty}"/>
+      //    <property name="longValue" value="${longProperty}"/>
+      //  </cache>
       Properties props = context.getChildrenAsProperties();
+      // 通过 MapperBuilderAssisatant 创建 cache 对象, 并添加到 Configuration.caches 集合
       builderAssistant.useNewCache(typeClass, evictionClass, flushInterval, size, readWrite, blocking, props);
     }
   }
 
+  /**
+   * j解析 mapper 中的 parameterMap
+   * @param list
+   */
   private void parameterMapElement(List<XNode> list) {
     for (XNode parameterMapNode : list) {
       String id = parameterMapNode.getStringAttribute("id");
@@ -421,6 +464,10 @@ public class XMLMapperBuilder extends BaseBuilder {
     }
   }
 
+  /**
+   * 注册 AuthorMapper 接口到 Configuration MapperRegistry 中
+   * public interface AuthorMapper
+   */
   private void bindMapperForNamespace() {
     String namespace = builderAssistant.getCurrentNamespace();
     if (namespace != null) {

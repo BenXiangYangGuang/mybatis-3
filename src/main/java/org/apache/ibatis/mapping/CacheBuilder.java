@@ -35,16 +35,28 @@ import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
 
 /**
+ * mapper 实体二级缓存构造器
  * @author Clinton Begin
  */
 public class CacheBuilder {
+  // Cache 对象的唯一标识， 一般情况下对应映射文件中的配置 namespace
   private final String id;
+  //  Cache 口的真正实现类，默认位是前面介绍的 PerpetualCache
   private Class<? extends Cache> implementation;
+  // 装饰器集合，默认只包含 LruCache class;淘汰策略的装饰器集合
   private final List<Class<? extends Cache>> decorators;
+  // Cache 大小
   private Integer size;
+  // 清理周期
   private Long clearInterval;
+  // 是否可读写
   private boolean readWrite;
+  // 其他配置信息
+  //<cache type="com.domain.something.MyCustomCache">
+  //  <property name="cacheFile" value="/tmp/my-custom-cache.tmp"/>
+  //</cache>
   private Properties properties;
+  // 是否阻塞
   private boolean blocking;
 
   public CacheBuilder(String id) {
@@ -90,22 +102,34 @@ public class CacheBuilder {
   }
 
   public Cache build() {
+    // 如采implementation 字段和 decorators 集合为空，则为其设立默认佳， implementation 默认
+    // 值是 PerpetualCache class, decorators 集合，默认只包含 LruCache.cla ss
     setDefaultImplementations();
+    // 根据 implementation 指定的类型 通过反射获取参数为 String 类型的构造方法，并通过该构造方法创建 Cache 对象
     Cache cache = newBaseCacheInstance(implementation, id);
+    // 根据＜cache＞节点 <property＞信息，初始化 Cache 对象
     setCacheProperties(cache);
     // issue #352, do not apply decorators to custom caches
+    // 检测 cache 对象 类型，如果是 PerpetualCache 类型，则为其添加 decorators 集合中的装饰器；
+    // 如果自定义类型的 Cache 接口实现,则不添加 decorators 集合中的装饰器
     if (PerpetualCache.class.equals(cache.getClass())) {
       for (Class<? extends Cache> decorator : decorators) {
+        // 通过反射获取参数为 Cache 类型的构造方法，并通过该构造方法创建装饰器
         cache = newCacheDecoratorInstance(decorator, cache);
-        setCacheProperties(cache);
+        setCacheProperties(cache); // 配置 cache 对象的属性
       }
+      //添加 MyBatis 中提供的标准装饰器
       cache = setStandardDecorators(cache);
     } else if (!LoggingCache.class.isAssignableFrom(cache.getClass())) {
+      // 如果不是 LoggingCache 的子类，则添加 LoggingCache 装饰器
       cache = new LoggingCache(cache);
     }
     return cache;
   }
 
+  /**
+   * 设置默认缓存类和淘汰策略
+   */
   private void setDefaultImplementations() {
     if (implementation == null) {
       implementation = PerpetualCache.class;
@@ -115,8 +139,15 @@ public class CacheBuilder {
     }
   }
 
+  /**
+   * 添加 MyBatis 中提供的标准装饰器;
+   * 根据 cache 不同配置属性，添加不同类型的缓存装饰器
+   * @param cache
+   * @return
+   */
   private Cache setStandardDecorators(Cache cache) {
     try {
+      // 创建 cache 对象对应的 MetaObject 对象
       MetaObject metaCache = SystemMetaObject.forObject(cache);
       if (size != null && metaCache.hasSetter("size")) {
         metaCache.setValue("size", size);
@@ -128,6 +159,7 @@ public class CacheBuilder {
       if (readWrite) {
         cache = new SerializedCache(cache);
       }
+      // 默认添加 LoggingCache 和 SynchronizedCache 两个装饰器
       cache = new LoggingCache(cache);
       cache = new SynchronizedCache(cache);
       if (blocking) {
@@ -139,14 +171,24 @@ public class CacheBuilder {
     }
   }
 
+  /**
+   * 根据 <cache> 节点下配置的 <property> 的信息，初始化 Cache 对象
+   * @param cache
+   */
   private void setCacheProperties(Cache cache) {
     if (properties != null) {
+      // cache 对应的创建 MetaObject 对象
       MetaObject metaCache = SystemMetaObject.forObject(cache);
       for (Map.Entry<Object, Object> entry : properties.entrySet()) {
+        // 配置项的名称， Cache 对应的属性名称
         String name = (String) entry.getKey();
+        // 配置项的值， Cache 对应的属性值
         String value = (String) entry.getValue();
+        // 检测 cache 是否有该属性对应的 setter 方法
         if (metaCache.hasSetter(name)) {
+          // 获取该属性的类型
           Class<?> type = metaCache.getSetterType(name);
+          // 进行类 转换 ，并设置该属性位
           if (String.class == type) {
             metaCache.setValue(name, value);
           } else if (int.class == type
@@ -176,6 +218,7 @@ public class CacheBuilder {
         }
       }
     }
+    // 如果 Cache 类继承了 InitializingObject 接口， 则调用其 initialize() 方法继续 定义的初始化操作
     if (InitializingObject.class.isAssignableFrom(cache.getClass())) {
       try {
         ((InitializingObject) cache).initialize();

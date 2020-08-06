@@ -50,6 +50,7 @@ import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 
 /**
+ * MapperBuilderAssistant 是一个解析 Mapper 的辅助类,用于命名空间、cache Mapper 缓存 等；
  * @author Clinton Begin
  */
 public class MapperBuilderAssistant extends BaseBuilder {
@@ -121,6 +122,17 @@ public class MapperBuilderAssistant extends BaseBuilder {
     }
   }
 
+  /**
+   * 构造者模式，创建缓存，并放入 Configuration 的缓存集合中
+   * @param typeClass 缓存实现类
+   * @param evictionClass 缓存策略实现类
+   * @param flushInterval 刷新间隔
+   * @param size 缓存大小
+   * @param readWrite 只读属性
+   * @param blocking 阻塞属性
+   * @param props 二级缓存的缓存属性
+   * @return
+   */
   public Cache useNewCache(Class<? extends Cache> typeClass,
       Class<? extends Cache> evictionClass,
       Long flushInterval,

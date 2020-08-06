@@ -153,12 +153,14 @@ public class Configuration {
   protected final Map<String, MappedStatement> mappedStatements = new StrictMap<MappedStatement>("Mapped Statements collection")
       .conflictMessageProducer((savedValue, targetValue) ->
           ". please check " + savedValue.getResource() + " and " + targetValue.getResource());
+  // value （默认是映射文件的 namespace ）与 Cache 象（二级缓存）
   protected final Map<String, Cache> caches = new StrictMap<>("Caches collection");
   protected final Map<String, ResultMap> resultMaps = new StrictMap<>("Result Maps collection");
+  // key org.apache.ibatis.domain.blog.mappers.AuthorMapper.selectAuthor ParameterMap
   protected final Map<String, ParameterMap> parameterMaps = new StrictMap<>("Parameter Maps collection");
   protected final Map<String, KeyGenerator> keyGenerators = new StrictMap<>("Key Generators collection");
-
-  protected final Set<String> loadedResources = new HashSet<>();
+  // 包含 mapper.xml 和 AuthorMapper 接口
+  protected final Set<String> loadedResources = new HashSet<>(); // mapper.xml 已经加载的集合
   protected final Map<String, XNode> sqlFragments = new StrictMap<>("XML fragments parsed from previous mappers"); // sql 片段
 
   protected final Collection<XMLStatementBuilder> incompleteStatements = new LinkedList<>();
@@ -900,11 +902,11 @@ public class Configuration {
       }
     }
   }
-
+  // 受限制的 key 为 String 的HashMap
   protected static class StrictMap<V> extends HashMap<String, V> {
 
     private static final long serialVersionUID = -4950446264854982944L;
-    private final String name;
+    private final String name;  // 一个名字
     private BiFunction<V, V, String> conflictMessageProducer;
 
     public StrictMap(String name, int initialCapacity, float loadFactor) {
@@ -943,16 +945,22 @@ public class Configuration {
     @Override
     @SuppressWarnings("unchecked")
     public V put(String key, V value) {
+      // 如果已经包含了该 key ，则直接返回异常
       if (containsKey(key)) {
         throw new IllegalArgumentException(name + " already contains value for " + key
             + (conflictMessageProducer == null ? "" : conflictMessageProducer.apply(super.get(key), value)));
       }
       if (key.contains(".")) {
+        // 按照”·”将 key 切分成数量且，并将数组的最后一项作为
+        // key org.apache.ibatis.domain.blog.mappers.AuthorMapper.selectAuthor
+        // shortKey selectAuthor
         final String shortKey = getShortName(key);
         if (super.get(shortKey) == null) {
+          // 如果不包含指定 shortKey ，则添加该键位对
           super.put(shortKey, value);
         } else {
           //如果存在，放一个Ambiguity占位符，在get的时候，进行类型判断，类型相同抛出异常
+          // 如果该 shortKey 已经存在， 则将 value 改成 Ambiguity 对象
           super.put(shortKey, (V) new Ambiguity(shortKey));
         }
       }
@@ -962,9 +970,11 @@ public class Configuration {
     @Override
     public V get(Object key) {
       V value = super.get(key);
+      // 如果该 key 没有对应的 value ，则报错
       if (value == null) {
         throw new IllegalArgumentException(name + " does not contain value for " + key);
       }
+      // 如果 value Ambiguity 类型，则报错
       if (value instanceof Ambiguity) {
         throw new IllegalArgumentException(((Ambiguity) value).getSubject() + " is ambiguous in " + name
             + " (try using the full name including the namespace, or rename one of the entries)");
@@ -972,6 +982,8 @@ public class Configuration {
       return value;
     }
     // 模糊的
+    //Ambiguity 是 StrictMap 定义的静态内部类，它表示的是存在二义性的键值对。 Ambiguity
+    //中使用 subject 宇段 记录了存在二义性的 key ，并提供了相应的 ge 方法。
     protected static class Ambiguity {
       final private String subject;
 
