@@ -21,6 +21,9 @@ import java.util.Map;
 import org.apache.ibatis.session.Configuration;
 
 /**
+ * 鉴别器；辨别者
+ * 和 java 中的 switch 语法一样，根据不同查询结果，走不同分支条件
+ * it behaves much like a switch statement in Java.
  * @author Clinton Begin
  */
 public class Discriminator {

@@ -17,6 +17,9 @@ package org.apache.ibatis.domain.blog;
 
 import java.util.List;
 
+/**
+ * 博客，网站
+ */
 public class Blog {
 
   private int id;

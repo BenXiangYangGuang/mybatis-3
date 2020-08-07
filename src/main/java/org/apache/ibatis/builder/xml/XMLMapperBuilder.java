@@ -203,14 +203,22 @@ public class XMLMapperBuilder extends BaseBuilder {
       }
     }
   }
-
+  //通过前面对＜cache＞节点解析过程的介绍我们知道， XMLMapperBuilder.cacheElement（）方
+  //会为每个 namespace 创建 个对应的 Cache 对象，井在 Configuration.caches 集合中记
+  //namespace Cache 对象之间的对应关系。如果我们希望多个 namespace 共用同一个二级缓存，
+  //即同一个 Cache 对象，则可以使用＜cache-ref>节点进行配置。
   private void cacheRefElement(XNode context) {
     if (context != null) {
+      // 将当前 Mapper 配置文件的 name space 与被引用的 Cache 所在的 name space 之间的对应关单，
+      // 记录 Configuration.cacheRefMap 集合中
       configuration.addCacheRef(builderAssistant.getCurrentNamespace(), context.getStringAttribute("namespace"));
+      // 创建 CacheRefResolver 对象
       CacheRefResolver cacheRefResolver = new CacheRefResolver(builderAssistant, context.getStringAttribute("namespace"));
       try {
+        // 解析 Cache 引用，该过程主要是设置 MapperBuil derAssistant 中的 currentCache 和 unresolvedCacheRef 字段
         cacheRefResolver.resolveCacheRef();
       } catch (IncompleteElementException e) {
+        // 如采解析过程 现异常，则添加到 Configuration.incompleteCacheRefs 集合， 稍后再解析
         configuration.addIncompleteCacheRef(cacheRefResolver);
       }
     }
@@ -299,39 +307,65 @@ public class XMLMapperBuilder extends BaseBuilder {
     return resultMapElement(resultMapNode, Collections.emptyList(), null);
   }
 
+  /**
+   * 解析 <resultMap> 节点
+   * 	<resultMap id="selectAuthor" type="org.apache.ibatis.domain.blog.Author">
+   * 		<id column="id" property="id" />
+   * 		<result property="username" column="username" />
+   * 		<result property="password" column="password" />
+   * 		<result property="email" column="email" />
+   * 		<result property="bio" column="bio" />
+   * 		<result property="favouriteSection" column="favourite_section" />
+   * 	</resultMap>
+   * @param resultMapNode
+   * @param additionalResultMappings 额外的映射关系
+   * @param enclosingType
+   * @return
+   * @throws Exception
+   */
   private ResultMap resultMapElement(XNode resultMapNode, List<ResultMapping> additionalResultMappings, Class<?> enclosingType) throws Exception {
     ErrorContext.instance().activity("processing " + resultMapNode.getValueBasedIdentifier());
     String type = resultMapNode.getStringAttribute("type",
         resultMapNode.getStringAttribute("ofType",
             resultMapNode.getStringAttribute("resultType",
                 resultMapNode.getStringAttribute("javaType"))));
+    // type 实体对象类
     Class<?> typeClass = resolveClass(type);
     if (typeClass == null) {
       typeClass = inheritEnclosingType(resultMapNode, enclosingType);
     }
+    // 辨别器，相当于 java 中的 switch 语法
     Discriminator discriminator = null;
-    List<ResultMapping> resultMappings = new ArrayList<>();
-    resultMappings.addAll(additionalResultMappings);
+    List<ResultMapping> resultMappings = new ArrayList<>(); // resultMap 中的 <result property="username" column="username" /> 对应关系列的 存放集合
+    resultMappings.addAll(additionalResultMappings); // 添加额外的映射关系
     List<XNode> resultChildren = resultMapNode.getChildren();
     for (XNode resultChild : resultChildren) {
+      // 处理 <constructor> 节点
       if ("constructor".equals(resultChild.getName())) {
         processConstructorElement(resultChild, typeClass, resultMappings);
+        // 处理 <discriminator> 节点
       } else if ("discriminator".equals(resultChild.getName())) {
         discriminator = processDiscriminatorElement(resultChild, typeClass, resultMappings);
       } else {
+        // 处理 <id＞、＜result＞、 <association＞、＜collection＞等节点
+        // id constructor 标识集合， 一个对应关系列的标志，用于一些特殊标志（id constructor）的解析
         List<ResultFlag> flags = new ArrayList<>();
         if ("id".equals(resultChild.getName())) {
           flags.add(ResultFlag.ID);
         }
+        // 创建 ResultMapping 对象，添加 ResultMapping 结果到集合
         resultMappings.add(buildResultMappingFromContext(resultChild, typeClass, flags));
       }
     }
     String id = resultMapNode.getStringAttribute("id",
             resultMapNode.getValueBasedIdentifier());
     String extend = resultMapNode.getStringAttribute("extends");
+    // 自动映射
     Boolean autoMapping = resultMapNode.getBooleanAttribute("autoMapping");
+    // ResultMap 对象构建解决器
     ResultMapResolver resultMapResolver = new ResultMapResolver(builderAssistant, id, typeClass, extend, discriminator, resultMappings, autoMapping);
     try {
+      //创建 ResultMap 对象，并添加到 Configuration.resultMaps 集合中，该集合是 StrictMap 类型
       return resultMapResolver.resolve();
     } catch (IncompleteElementException  e) {
       configuration.addIncompleteResultMap(resultMapResolver);
@@ -352,6 +386,13 @@ public class XMLMapperBuilder extends BaseBuilder {
     return null;
   }
 
+  /**
+   * 解析 <constructor> 节点
+   * @param resultChild
+   * @param resultType
+   * @param resultMappings
+   * @throws Exception
+   */
   private void processConstructorElement(XNode resultChild, Class<?> resultType, List<ResultMapping> resultMappings) throws Exception {
     List<XNode> argChildren = resultChild.getChildren();
     for (XNode argChild : argChildren) {
@@ -364,6 +405,30 @@ public class XMLMapperBuilder extends BaseBuilder {
     }
   }
 
+  /**
+   * 构建一个 Discriminator 对象
+   *
+   * <resultMap id="vehicleResult" type="Vehicle">
+   *   <id property="id" column="id" />
+   *   <result property="vin" column="vin"/>
+   *   <result property="year" column="year"/>
+   *   <result property="make" column="make"/>
+   *   <result property="model" column="model"/>
+   *   <result property="color" column="color"/>
+   *   <discriminator javaType="int" column="vehicle_type">
+   *     <case value="1" resultMap="carResult"/>
+   *     <case value="2" resultMap="truckResult"/>
+   *     <case value="3" resultMap="vanResult"/>
+   *     <case value="4" resultMap="suvResult"/>
+   *   </discriminator>
+   * </resultMap>
+   * 参考官方文档:https://mybatis.org/mybatis-3/sqlmap-xml.html
+   * @param context
+   * @param resultType
+   * @param resultMappings
+   * @return
+   * @throws Exception
+   */
   private Discriminator processDiscriminatorElement(XNode context, Class<?> resultType, List<ResultMapping> resultMappings) throws Exception {
     String column = context.getStringAttribute("column");
     String javaType = context.getStringAttribute("javaType");
@@ -414,6 +479,14 @@ public class XMLMapperBuilder extends BaseBuilder {
     return context.getStringAttribute("databaseId") == null;
   }
 
+  /**
+   * 构建一个 ResultMapping 对象
+   * @param context
+   * @param resultType
+   * @param flags
+   * @return
+   * @throws Exception
+   */
   private ResultMapping buildResultMappingFromContext(XNode context, Class<?> resultType, List<ResultFlag> flags) throws Exception {
     String property;
     if (flags.contains(ResultFlag.CONSTRUCTOR)) {
@@ -425,6 +498,7 @@ public class XMLMapperBuilder extends BaseBuilder {
     String javaType = context.getStringAttribute("javaType");
     String jdbcType = context.getStringAttribute("jdbcType");
     String nestedSelect = context.getStringAttribute("select");
+    // 内部 ResultMaping 映射处理
     String nestedResultMap = context.getStringAttribute("resultMap",
         processNestedResultMappings(context, Collections.emptyList(), resultType));
     String notNullColumn = context.getStringAttribute("notNullColumn");

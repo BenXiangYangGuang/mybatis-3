@@ -155,6 +155,7 @@ public class Configuration {
           ". please check " + savedValue.getResource() + " and " + targetValue.getResource());
   // value （默认是映射文件的 namespace ）与 Cache 象（二级缓存）
   protected final Map<String, Cache> caches = new StrictMap<>("Caches collection");
+  // ResultMap 对象存放集合
   protected final Map<String, ResultMap> resultMaps = new StrictMap<>("Result Maps collection");
   // key org.apache.ibatis.domain.blog.mappers.AuthorMapper.selectAuthor ParameterMap
   protected final Map<String, ParameterMap> parameterMaps = new StrictMap<>("Parameter Maps collection");
@@ -164,15 +165,17 @@ public class Configuration {
   protected final Map<String, XNode> sqlFragments = new StrictMap<>("XML fragments parsed from previous mappers"); // sql 片段
 
   protected final Collection<XMLStatementBuilder> incompleteStatements = new LinkedList<>();
-  protected final Collection<CacheRefResolver> incompleteCacheRefs = new LinkedList<>();
-  protected final Collection<ResultMapResolver> incompleteResultMaps = new LinkedList<>();
-  protected final Collection<MethodResolver> incompleteMethods = new LinkedList<>();
+  protected final Collection<CacheRefResolver> incompleteCacheRefs = new LinkedList<>();   // 当前解析出现异常的 CacheRefResolver 对象
+  protected final Collection<ResultMapResolver> incompleteResultMaps = new LinkedList<>(); // 当前解析出现异常的 ResultMapResolver 对象
+  protected final Collection<MethodResolver> incompleteMethods = new LinkedList<>();  // 当前解析出现异常的 MethodResolver 对象
 
   /*
    * A map holds cache-ref relationship. The key is the namespace that
    * references a cache bound to another namespace and the value is the
    * namespace which the actual cache is bound to.
    */
+  //key 是<cache-ref> 节点所在的 namespace , value 是<cache-ref> 节点的 namespace 属性所指 定的namespace
+  // 一个mapper 实体，引用另一个实体，公用 另一个实体的 mapper 缓存对象;
   protected final Map<String, String> cacheRefMap = new HashMap<>();
 
   public Configuration(Environment environment) {

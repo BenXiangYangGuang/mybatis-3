@@ -18,6 +18,9 @@ package org.apache.ibatis.domain.blog;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * 文章
+ */
 public class Post {
 
   private int id;

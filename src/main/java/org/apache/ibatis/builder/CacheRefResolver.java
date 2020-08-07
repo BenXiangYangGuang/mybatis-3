@@ -18,6 +18,11 @@ package org.apache.ibatis.builder;
 import org.apache.ibatis.cache.Cache;
 
 /**
+ * 根据 cacheRef namespace 找到 对应点 Cache
+ * cacheRefResolver 是一个简单的 cache 引用解析器， 其中封装了被引用 namespace 以及
+ * 当前 XMLMapperBuilder 对应的 MapperBuilderAssistant 对象 CacheRefResolver.resolveCacheRef()
+ * 方法会调 MapperBuilder Assistant. useCacheRef（） 方法。在 MapperBuilder Assistant.useCacheRef()
+ * 方法中会通过 namespace 找被引用的 Cache 对象
  * @author Clinton Begin
  */
 public class CacheRefResolver {

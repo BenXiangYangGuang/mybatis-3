@@ -16,6 +16,7 @@
 package org.apache.ibatis.mapping;
 
 /**
+ * mapper.xml 中 ResultMapper 节点 ID、 CONSTRUCTOR
  * @author Clinton Begin
  */
 public enum ResultFlag {

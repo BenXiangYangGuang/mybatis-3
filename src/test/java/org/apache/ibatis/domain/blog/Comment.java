@@ -15,6 +15,9 @@
  */
 package org.apache.ibatis.domain.blog;
 
+/**
+ * 评论
+ */
 public class Comment {
 
   private int id;
