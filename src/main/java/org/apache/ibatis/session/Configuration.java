@@ -148,23 +148,23 @@ public class Configuration {
   protected final InterceptorChain interceptorChain = new InterceptorChain(); // 插件链，存放 配置文件 配置的插件
   protected final TypeHandlerRegistry typeHandlerRegistry = new TypeHandlerRegistry(this);
   protected final TypeAliasRegistry typeAliasRegistry = new TypeAliasRegistry();
-  protected final LanguageDriverRegistry languageRegistry = new LanguageDriverRegistry();
+  protected final LanguageDriverRegistry languageRegistry = new LanguageDriverRegistry(); // 动态 SQL 语言驱动插件注册器
 
   protected final Map<String, MappedStatement> mappedStatements = new StrictMap<MappedStatement>("Mapped Statements collection")
       .conflictMessageProducer((savedValue, targetValue) ->
-          ". please check " + savedValue.getResource() + " and " + targetValue.getResource());
+          ". please check " + savedValue.getResource() + " and " + targetValue.getResource()); // MappedStatement 对象存储集合
   // value （默认是映射文件的 namespace ）与 Cache 象（二级缓存）
   protected final Map<String, Cache> caches = new StrictMap<>("Caches collection");
   // ResultMap 对象存放集合
   protected final Map<String, ResultMap> resultMaps = new StrictMap<>("Result Maps collection");
   // key org.apache.ibatis.domain.blog.mappers.AuthorMapper.selectAuthor ParameterMap
   protected final Map<String, ParameterMap> parameterMaps = new StrictMap<>("Parameter Maps collection");
-  protected final Map<String, KeyGenerator> keyGenerators = new StrictMap<>("Key Generators collection");
+  protected final Map<String, KeyGenerator> keyGenerators = new StrictMap<>("Key Generators collection"); // <selectKey> 节点保存集合，selectKey 用来 insert | update 生成主键 Id；
   // 包含 mapper.xml 和 AuthorMapper 接口
   protected final Set<String> loadedResources = new HashSet<>(); // mapper.xml 已经加载的集合
   protected final Map<String, XNode> sqlFragments = new StrictMap<>("XML fragments parsed from previous mappers"); // sql 片段
 
-  protected final Collection<XMLStatementBuilder> incompleteStatements = new LinkedList<>();
+  protected final Collection<XMLStatementBuilder> incompleteStatements = new LinkedList<>(); // 解析 insert、update、select、delete 节点错误异常 XMLStatementBuilder 对象，存储集合
   protected final Collection<CacheRefResolver> incompleteCacheRefs = new LinkedList<>();   // 当前解析出现异常的 CacheRefResolver 对象
   protected final Collection<ResultMapResolver> incompleteResultMaps = new LinkedList<>(); // 当前解析出现异常的 ResultMapResolver 对象
   protected final Collection<MethodResolver> incompleteMethods = new LinkedList<>();  // 当前解析出现异常的 MethodResolver 对象
@@ -213,7 +213,9 @@ public class Configuration {
     typeAliasRegistry.registerAlias("CGLIB", CglibProxyFactory.class);
     typeAliasRegistry.registerAlias("JAVASSIST", JavassistProxyFactory.class);
 
+    // 设置默认动态 SQL 语言驱动
     languageRegistry.setDefaultDriverClass(XMLLanguageDriver.class);
+    // 注册 RawLanguageDriver
     languageRegistry.register(RawLanguageDriver.class);
   }
 

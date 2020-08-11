@@ -16,6 +16,8 @@
 package org.apache.ibatis.scripting.xmltags;
 
 /**
+ * TextSqlNode StaticTextSql 等都是 SqIN ode 接口的实现， SqlNode 接口的
+ * 每个实现都对应于不同的动态 SQL 节点类型
  * @author Clinton Begin
  */
 public interface SqlNode {

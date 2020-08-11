@@ -38,9 +38,14 @@ public class XMLLanguageDriver implements LanguageDriver {
     return new DefaultParameterHandler(mappedStatement, parameterObject, boundSql);
   }
 
+  /**
+   * 根绝 动态 SQL 语言脚本 生成 SqlSource
+   */
   @Override
   public SqlSource createSqlSource(Configuration configuration, XNode script, Class<?> parameterType) {
+    //动态 SQL 语言脚本 解析器
     XMLScriptBuilder builder = new XMLScriptBuilder(configuration, script, parameterType);
+    // 解析 mapper.xml 中的动态 SQL 语言
     return builder.parseScriptNode();
   }
 

@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * 动态 SQL 语言驱动注册器
  * @author Frank D. Martinez [mnesarco]
  */
 public class LanguageDriverRegistry {

@@ -38,6 +38,11 @@ public class TextSqlNode implements SqlNode {
     this.injectionFilter = injectionFilter;
   }
 
+  /**
+   * 判断是否为 动态 SQL
+   * isDynamic() 会通过 GenericTokenParser 和 DynamicCheckerTokenParser 配合解析文本节点，并判断它是否为动态 SQL
+   * @return
+   */
   public boolean isDynamic() {
     DynamicCheckerTokenParser checker = new DynamicCheckerTokenParser();
     GenericTokenParser parser = createParser(checker);
@@ -87,6 +92,7 @@ public class TextSqlNode implements SqlNode {
     }
   }
 
+  // 用来检测是否为动态 SQL
   private static class DynamicCheckerTokenParser implements TokenHandler {
 
     private boolean isDynamic;

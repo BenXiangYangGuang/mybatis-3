@@ -23,6 +23,12 @@ import org.apache.ibatis.parsing.XNode;
 import org.apache.ibatis.scripting.defaults.DefaultParameterHandler;
 import org.apache.ibatis.session.Configuration;
 
+/**
+ * 动态 SQL if | choose | trim | foreach | when | otherwise | where | set
+ * 动态 SQL 中的插入脚本语言，允许你插入一种语言驱动，并基于这种语言来编写动态 SQL 查询语句；
+ * 解析动态 SQL 的语言驱动，用来解析，你所写的 动态 SQL 标签
+ * 实现以下接口插入一种语言
+ */
 public interface LanguageDriver {
 
   /**

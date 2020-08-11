@@ -57,7 +57,8 @@ public class XMLMapperBuilder extends BaseBuilder {
 
   private final XPathParser parser;
   private final MapperBuilderAssistant builderAssistant;
-  private final Map<String, XNode> sqlFragments;
+  // sql 节点片段保存
+  private final Map<String, XNode> sqlFragments; // key namespace + id 全路径名称，value 为 sql 语句
   private final String resource;  // mapper 文件路径 org/apache/ibatis/builder/BlogMapper.xml
 
   @Deprecated
@@ -134,13 +135,17 @@ public class XMLMapperBuilder extends BaseBuilder {
       cacheElement(context.evalNode("cache"));       //解析 <cache> 节点
       parameterMapElement(context.evalNodes("/mapper/parameterMap"));   //解析 <mapper> 下的 <parameterMap> 节点 （该节点 废弃，不再推荐使用，不做详细介绍）
       resultMapElements(context.evalNodes("/mapper/resultMap"));  //解析 <mapper> 下的 <resultMap> 节点
-      sqlElement(context.evalNodes("/mapper/sql"));  //解析 <mapper> 下的 <sql> 节点
+      sqlElement(context.evalNodes("/mapper/sql"));  //解析 <mapper> 下的 <sql> 节点; <sql> 节点 可重用的 SQL 语句片段
       buildStatementFromContext(context.evalNodes("select|insert|update|delete")); //解析 <mapper> 下的 <select|insert|update|delete> 节点
     } catch (Exception e) {
       throw new BuilderException("Error parsing Mapper XML. The XML location is '" + resource + "'. Cause: " + e, e);
     }
   }
 
+  /**
+   * 解析 <mapper> 下的 <select|insert|update|delete> 节点
+   * @param list
+   */
   private void buildStatementFromContext(List<XNode> list) {
     if (configuration.getDatabaseId() != null) {
       buildStatementFromContext(list, configuration.getDatabaseId());
@@ -148,17 +153,24 @@ public class XMLMapperBuilder extends BaseBuilder {
     buildStatementFromContext(list, null);
   }
 
+  /**
+   * 解析 <mapper> 下的 <select|insert|update|delete> 节点
+   * @param list
+   * @param requiredDatabaseId
+   */
   private void buildStatementFromContext(List<XNode> list, String requiredDatabaseId) {
     for (XNode context : list) {
+      // 一个 SQL 语句节点 ，一个 XMLStatementBuilder 解析对象
       final XMLStatementBuilder statementParser = new XMLStatementBuilder(configuration, builderAssistant, context, requiredDatabaseId);
       try {
+        // 具体解析 SQL <select|insert|update|delete> 语句方法
         statementParser.parseStatementNode();
       } catch (IncompleteElementException e) {
         configuration.addIncompleteStatement(statementParser);
       }
     }
   }
-
+  //处理 configurationElement() 方法中解析失败的 <resultMap> 节点
   private void parsePendingResultMaps() {
     Collection<ResultMapResolver> incompleteResultMaps = configuration.getIncompleteResultMaps();
     synchronized (incompleteResultMaps) {
@@ -173,7 +185,7 @@ public class XMLMapperBuilder extends BaseBuilder {
       }
     }
   }
-
+  //处理 configurationElement() 方法中解析失败的 <cache-ref> 节点
   private void parsePendingCacheRefs() {
     Collection<CacheRefResolver> incompleteCacheRefs = configuration.getIncompleteCacheRefs();
     synchronized (incompleteCacheRefs) {
@@ -188,7 +200,7 @@ public class XMLMapperBuilder extends BaseBuilder {
       }
     }
   }
-
+  //处理 configurationElement() 方法中解析失败的 SQL 语句节点
   private void parsePendingStatements() {
     Collection<XMLStatementBuilder> incompleteStatements = configuration.getIncompleteStatements();
     synchronized (incompleteStatements) {
@@ -446,6 +458,10 @@ public class XMLMapperBuilder extends BaseBuilder {
     return builderAssistant.buildDiscriminator(resultType, column, javaTypeClass, jdbcTypeEnum, typeHandlerClass, discriminatorMap);
   }
 
+  /**
+   * 解析 sql 节点
+   * @param list
+   */
   private void sqlElement(List<XNode> list) {
     if (configuration.getDatabaseId() != null) {
       sqlElement(list, configuration.getDatabaseId());
@@ -453,17 +469,31 @@ public class XMLMapperBuilder extends BaseBuilder {
     sqlElement(list, null);
   }
 
+  /**
+   * 解析 sql 节点
+   * @param list
+   * @param requiredDatabaseId
+   */
   private void sqlElement(List<XNode> list, String requiredDatabaseId) {
     for (XNode context : list) {
       String databaseId = context.getStringAttribute("databaseId");
       String id = context.getStringAttribute("id");
+      // 根据命名空间 更新 id  全名称
       id = builderAssistant.applyCurrentNamespace(id, false);
+      // 检测＜sql＞的 databaseId 与当前 Configuration 中记录的 databaseId 是否一致
       if (databaseIdMatchesCurrent(id, databaseId, requiredDatabaseId)) {
         sqlFragments.put(id, context);
       }
     }
   }
 
+  /**
+   * 判断 databaseId  和要求的 requiredDatabaseId 是否相等，或者是否 sqlFragments 是否包含 这个 <sql> 节点
+   * @param id
+   * @param databaseId
+   * @param requiredDatabaseId
+   * @return
+   */
   private boolean databaseIdMatchesCurrent(String id, String databaseId, String requiredDatabaseId) {
     if (requiredDatabaseId != null) {
       return requiredDatabaseId.equals(databaseId);

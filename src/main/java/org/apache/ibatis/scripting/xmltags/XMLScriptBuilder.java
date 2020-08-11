@@ -64,8 +64,10 @@ public class XMLScriptBuilder extends BaseBuilder {
   }
 
   public SqlSource parseScriptNode() {
+    // 首先判断当前的节点是不是有动态 SQL ，动态 SQL 会包括占位符或是动态 SQL 的相关节点
     MixedSqlNode rootSqlNode = parseDynamicTags(context);
     SqlSource sqlSource;
+    // 根据是否是动态 SQL, 创建相应的 SqlSource 对象
     if (isDynamic) {
       sqlSource = new DynamicSqlSource(configuration, rootSqlNode);
     } else {
@@ -74,26 +76,37 @@ public class XMLScriptBuilder extends BaseBuilder {
     return sqlSource;
   }
 
+  /**
+   * 解析动态标签 if | trim | where | if | set | foreach 等
+   * 遍历 <selectKey> 下的每个节点，如果包含任何标签节点，则认为是动态 SQL 语句；如果文本节点中含有 "${}" 占位符，也认为其为动态 SQL 语句
+   * @param node
+   * @return
+   */
   protected MixedSqlNode parseDynamicTags(XNode node) {
     List<SqlNode> contents = new ArrayList<>();
+    // 获取 <selectKey> 的所有子节点
     NodeList children = node.getNode().getChildNodes();
     for (int i = 0; i < children.getLength(); i++) {
+      // 创建 XNode，该过程会将能解析掉的 ${} 都解析掉
       XNode child = node.newXNode(children.item(i));
+      // 对文本节点处理
       if (child.getNode().getNodeType() == Node.CDATA_SECTION_NODE || child.getNode().getNodeType() == Node.TEXT_NODE) {
         String data = child.getStringBody("");
         TextSqlNode textSqlNode = new TextSqlNode(data);
         if (textSqlNode.isDynamic()) {
           contents.add(textSqlNode);
-          isDynamic = true;
+          isDynamic = true;    //标记为动态 SQL 语句
         } else {
           contents.add(new StaticTextSqlNode(data));
         }
       } else if (child.getNode().getNodeType() == Node.ELEMENT_NODE) { // issue #628
+        // 如果子节点是一个标签，那么一定是动态 SQL，并根据不同的动态标签生成不同的 NodeHandler
         String nodeName = child.getNode().getNodeName();
         NodeHandler handler = nodeHandlerMap.get(nodeName);
         if (handler == null) {
           throw new BuilderException("Unknown element <" + nodeName + "> in SQL statement.");
         }
+        // 处理动态 SQL，并将解析得到的 SqlNode 对象放入 contents 集合中保存
         handler.handleNode(child, contents);
         isDynamic = true;
       }
@@ -101,6 +114,8 @@ public class XMLScriptBuilder extends BaseBuilder {
     return new MixedSqlNode(contents);
   }
 
+  // 动态 SQL 节点处理器；
+  // 不同实现类会对不同动态 SQL 标签进行解析，生成对应的 SqlNode 对象，并添加到 contents 集合中
   private interface NodeHandler {
     void handleNode(XNode nodeToHandle, List<SqlNode> targetContents);
   }
@@ -143,7 +158,9 @@ public class XMLScriptBuilder extends BaseBuilder {
 
     @Override
     public void handleNode(XNode nodeToHandle, List<SqlNode> targetContents) {
+      // 调用 parseDynamicTags() 方法，解析 <where> 节点的子节点
       MixedSqlNode mixedSqlNode = parseDynamicTags(nodeToHandle);
+      // 创建 WhereSqlNode，并添加到 targetContents 集合中保存
       WhereSqlNode where = new WhereSqlNode(configuration, mixedSqlNode);
       targetContents.add(where);
     }

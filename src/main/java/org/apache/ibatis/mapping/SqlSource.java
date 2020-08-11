@@ -19,10 +19,14 @@ package org.apache.ibatis.mapping;
  * Represents the content of a mapped statement read from an XML file or an annotation.
  * It creates the SQL that will be passed to the database out of the input parameter received from the user.
  *
+ * SqlSource 接口表示映射文件或注解中定义的 SQL 语句;
+ * 但它表示的 SQL 语句是不能直接被数据库执行的，因为其中可能含有动态的 SQL 语句相关的节点 或是占位符等需要解析的元素。
+ *
  * @author Clinton Begin
  */
 public interface SqlSource {
 
+  //getBoundSql（）方法会根据映射文件或注解描述的 SQL 语句，以及传入的参敛，返回可执行的 SQL
   BoundSql getBoundSql(Object parameterObject);
 
 }

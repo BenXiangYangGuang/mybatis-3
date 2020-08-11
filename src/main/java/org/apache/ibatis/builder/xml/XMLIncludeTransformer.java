@@ -31,6 +31,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
+ * 处理 mapper.xml 中的 <include> 节点 和 ${xxx} 占位符；
  * @author Frank D. Martinez [mnesarco]
  */
 public class XMLIncludeTransformer {
@@ -45,30 +46,50 @@ public class XMLIncludeTransformer {
 
   public void applyIncludes(Node source) {
     Properties variablesContext = new Properties();
+    // 获取 mybatis-config.xml 中 <properties> 节点下定义的变量集合
     Properties configurationVariables = configuration.getVariables();
+    // if configurationVariables != null 放入 variablesContext 变量中；进行占位符变量替换
     Optional.ofNullable(configurationVariables).ifPresent(variablesContext::putAll);
     applyIncludes(source, variablesContext, false);
   }
 
   /**
+   * 递归地解析 sql fragments 中 include 节点;涉及 Node 节点的具体内容和属性；节点遍历等比较复杂。
+   * <sql id="someinclude">
+   *   from ${tablename}
+   * </sql>
+   * <select id="countAll" resultType="int">
+   *    select
+   *    B.id as blog_id,B.title as blog_title,B.author_id as blog_author_id
+   *    <include refid ="someinclude>
+   *      <property name="tablename" value="Blog"/>
+   *    </include>
+   * </select>
    * Recursively apply includes through all SQL fragments.
    * @param source Include node in DOM tree
    * @param variablesContext Current context for static variables with values
    */
   private void applyIncludes(Node source, final Properties variablesContext, boolean included) {
-    if (source.getNodeName().equals("include")) {
+    // 处理 <include> 节点
+    if (source.getNodeName().equals("include")) {   // --- (2)
+      // 查找refId 属性指向的 <sql> 节点，返回的是深克隆的 Node 对象
       Node toInclude = findSqlFragment(getStringAttribute(source, "refid"), variablesContext);
+      // 解析 <include> 节点下的 <property> 节点，将得到的键值对添加到 variablesContext 中，并形成新的 Properties 对象返回，
       Properties toIncludeContext = getVariablesContext(source, variablesContext);
+      // 递归处理 <include> 节点，在 <sql> 节点中可能会使用 <include> 引用 其他 SQL 片段
       applyIncludes(toInclude, toIncludeContext, true);
       if (toInclude.getOwnerDocument() != source.getOwnerDocument()) {
         toInclude = source.getOwnerDocument().importNode(toInclude, true);
       }
+      // 将 <include> 节点替换成 <sql> 节点
       source.getParentNode().replaceChild(toInclude, source);
+      // 将 <sql> 节点的子节点添加到 <sql> 节点前面
       while (toInclude.hasChildNodes()) {
         toInclude.getParentNode().insertBefore(toInclude.getFirstChild(), toInclude);
       }
+      // 删除 <sql> 节点
       toInclude.getParentNode().removeChild(toInclude);
-    } else if (source.getNodeType() == Node.ELEMENT_NODE) {
+    } else if (source.getNodeType() == Node.ELEMENT_NODE) {  // --- (1)
       if (included && !variablesContext.isEmpty()) {
         // replace variables in attribute values
         NamedNodeMap attributes = source.getAttributes();
@@ -81,9 +102,10 @@ public class XMLIncludeTransformer {
       for (int i = 0; i < children.getLength(); i++) {
         applyIncludes(children.item(i), variablesContext, included);
       }
-    } else if (included && (source.getNodeType() == Node.TEXT_NODE || source.getNodeType() == Node.CDATA_SECTION_NODE)
+    } else if (included && (source.getNodeType() == Node.TEXT_NODE || source.getNodeType() == Node.CDATA_SECTION_NODE)  // --- (3)
         && !variablesContext.isEmpty()) {
       // replace variables in text node
+      // 使用之前解析得到的 Properties 对象替换对应的占位符
       source.setNodeValue(PropertyParser.parse(source.getNodeValue(), variablesContext));
     }
   }

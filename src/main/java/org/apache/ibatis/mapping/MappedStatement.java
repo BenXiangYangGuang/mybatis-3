@@ -28,25 +28,29 @@ import org.apache.ibatis.logging.LogFactory;
 import org.apache.ibatis.scripting.LanguageDriver;
 import org.apache.ibatis.session.Configuration;
 
-/**查询sql语句的包装对象
+/**
+ * MappedStatement 表示映射配置文件中定义 SQL 节点;
+ * insert、update、delete、select sql语句的包装对象
+ *
  * @author Clinton Begin
  */
 public final class MappedStatement {
 
-  private String resource;
+  private String resource;  // namespace + id
   private Configuration configuration;
   private String id;
   private Integer fetchSize;
   private Integer timeout;
   private StatementType statementType;
   private ResultSetType resultSetType;
-  private SqlSource sqlSource;
+  private SqlSource sqlSource; // mapper 中的 sql 语句节点 insert、update、delete、select;最终可以执行的 sql 语句，只包含 ？ 占位符
   private Cache cache;
   private ParameterMap parameterMap;
   private List<ResultMap> resultMaps;
   private boolean flushCacheRequired;
   private boolean useCache;
   private boolean resultOrdered;
+  // sql 语句类型 UNKNOWN, INSERT, UPDATE, DELETE, SELECT, FLUSH
   private SqlCommandType sqlCommandType;
   private KeyGenerator keyGenerator;
   private String[] keyProperties;

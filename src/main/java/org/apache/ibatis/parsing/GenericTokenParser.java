@@ -16,6 +16,7 @@
 package org.apache.ibatis.parsing;
 
 /**
+ * 用来检测是否为 动态 SQL
  * @author Clinton Begin
  */
 public class GenericTokenParser {
