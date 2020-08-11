@@ -105,9 +105,20 @@ public class XMLMapperBuilder extends BaseBuilder {
     if (!configuration.isResourceLoaded(resource)) {
       configurationElement(parser.evalNode("/mapper")); // mapper 文件中的 <mapper> 节点
       configuration.addLoadedResource(resource); // 已经解析，添加这个 mapper.xml 到资源已经解析集合
-      bindMapperForNamespace(); //注册 Mapper 接口
+      // 映射配置文件 mapper.xml 对应 Mapper 接口进行绑定
+      bindMapperForNamespace(); //注册 Mapper 接口类
     }
     // pending 即将发生的
+    /**
+     * XMLMapperBuilder.configurationElement（）方法解析映射配置文件时，是按照从文件头到文
+     * 件尾的顺序解析的，但是时候在解析一个节点时， 引用定义在该节点之后的、还未解析的节点，这就会导致解析失败井抛出 IncompleteElementException
+     *
+     * 根据抛出异常的节点不同， MyBatis 会创建不同 的＊Resolver 对象， 井添加到 Configuration的不同 incomplete 集合中。
+     * 例如，上面解析 Mapper 接口中的 方法出现异常时，会创建MethodResolver 对象，并将其追加到 Configuration.incompleteMethods 集合（ LinkedList<MethodResolver＞类型）中暂存；
+     * 解析 ＜resultMap＞节点时出现异常， 则会将对应的ResultMapResolver 对象追加到 incompleteResultMaps ( LinkedList ResultMapResolver＞类型）集合中暂存 ；
+     * 解析 <cache-ref> 节点时出现异常 ，则会将对应的 CacheRefResolver 对象追加到 incompleteCacheRefs ( LinkedList CacheRefResolver＞类型）集合中暂存：
+     * 解析 SQL 语句节点时出现异常， 则会将对应的 XMLStatementBuilder 对象追加到 incompleteStatements （LinkedList<XMLStatementBuilder＞类型〉集合中暂存。
+     */
 
     parsePendingResultMaps(); //处理 configurationElement() 方法中解析失败的 <resultMap> 节点
     parsePendingCacheRefs();  //处理 configurationElement() 方法中解析失败的 <cache-ref> 节点
@@ -172,6 +183,7 @@ public class XMLMapperBuilder extends BaseBuilder {
   }
   //处理 configurationElement() 方法中解析失败的 <resultMap> 节点
   private void parsePendingResultMaps() {
+
     Collection<ResultMapResolver> incompleteResultMaps = configuration.getIncompleteResultMaps();
     synchronized (incompleteResultMaps) {
       Iterator<ResultMapResolver> iter = incompleteResultMaps.iterator();
@@ -181,6 +193,7 @@ public class XMLMapperBuilder extends BaseBuilder {
           iter.remove();
         } catch (IncompleteElementException e) {
           // ResultMap is still missing a resource...
+
         }
       }
     }
@@ -202,15 +215,17 @@ public class XMLMapperBuilder extends BaseBuilder {
   }
   //处理 configurationElement() 方法中解析失败的 SQL 语句节点
   private void parsePendingStatements() {
+    // 获取 Configuration.incompleteStatement 集合
     Collection<XMLStatementBuilder> incompleteStatements = configuration.getIncompleteStatements();
-    synchronized (incompleteStatements) {
+    synchronized (incompleteStatements) { // 加锁同步
       Iterator<XMLStatementBuilder> iter = incompleteStatements.iterator();
       while (iter.hasNext()) {
         try {
-          iter.next().parseStatementNode();
-          iter.remove();
+          iter.next().parseStatementNode(); // 重新解析 SQL 语句节点
+          iter.remove(); // 移除 XMLStatementBuilder 对象
         } catch (IncompleteElementException e) {
           // Statement is still missing a resource...
+          // 如果无法解析，则忽略改节点
         }
       }
     }
@@ -569,24 +584,29 @@ public class XMLMapperBuilder extends BaseBuilder {
   }
 
   /**
+   * 映射配置文件 mapper.xml 对应 Mapper 接口进行绑定
+   *
    * 注册 AuthorMapper 接口到 Configuration MapperRegistry 中
    * public interface AuthorMapper
    */
   private void bindMapperForNamespace() {
+    // 获取映射配置文件的命名空间
     String namespace = builderAssistant.getCurrentNamespace();
     if (namespace != null) {
       Class<?> boundType = null;
       try {
-        boundType = Resources.classForName(namespace);
+        boundType = Resources.classForName(namespace); //解析命名空间对应的类型
       } catch (ClassNotFoundException e) {
         //ignore, bound type is not required
       }
       if (boundType != null) {
-        if (!configuration.hasMapper(boundType)) {
+        if (!configuration.hasMapper(boundType)) {  //是否已经加载了 boundType 接口
           // Spring may not know the real resource name so we set a flag
           // to prevent loading again this resource from the mapper interface
           // look at MapperAnnotationBuilder#loadXmlResource
+          // 追加 namespace 前缀，并添加到 Configuration.loadedResources 集合中保存
           configuration.addLoadedResource("namespace:" + namespace);
+          // 注册 boundType 接口
           configuration.addMapper(boundType);
         }
       }

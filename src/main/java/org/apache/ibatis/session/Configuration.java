@@ -144,7 +144,7 @@ public class Configuration {
    */
   protected Class<?> configurationFactory;
 
-  protected final MapperRegistry mapperRegistry = new MapperRegistry(this); // mapper 文件注册器
+  protected final MapperRegistry mapperRegistry = new MapperRegistry(this); // mapper 接口类 注册器
   protected final InterceptorChain interceptorChain = new InterceptorChain(); // 插件链，存放 配置文件 配置的插件
   protected final TypeHandlerRegistry typeHandlerRegistry = new TypeHandlerRegistry(this);
   protected final TypeAliasRegistry typeAliasRegistry = new TypeAliasRegistry();
@@ -161,7 +161,7 @@ public class Configuration {
   protected final Map<String, ParameterMap> parameterMaps = new StrictMap<>("Parameter Maps collection");
   protected final Map<String, KeyGenerator> keyGenerators = new StrictMap<>("Key Generators collection"); // <selectKey> 节点保存集合，selectKey 用来 insert | update 生成主键 Id；
   // 包含 mapper.xml 和 AuthorMapper 接口
-  protected final Set<String> loadedResources = new HashSet<>(); // mapper.xml 已经加载的集合
+  protected final Set<String> loadedResources = new HashSet<>(); // namespace:mapper.xml 已经加载的集合
   protected final Map<String, XNode> sqlFragments = new StrictMap<>("XML fragments parsed from previous mappers"); // sql 片段
 
   protected final Collection<XMLStatementBuilder> incompleteStatements = new LinkedList<>(); // 解析 insert、update、select、delete 节点错误异常 XMLStatementBuilder 对象，存储集合

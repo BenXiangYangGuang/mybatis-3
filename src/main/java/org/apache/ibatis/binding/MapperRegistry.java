@@ -27,7 +27,7 @@ import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSession;
 
 /**
- * mapper 文件注册器
+ * mapper 接口类注册器
  * @author Clinton Begin
  * @author Eduardo Macarron
  * @author Lasse Voss
@@ -70,6 +70,7 @@ public class MapperRegistry {
         // otherwise the binding may automatically be attempted by the
         // mapper parser. If the type is already known, it won't try.
         MapperAnnotationBuilder parser = new MapperAnnotationBuilder(config, type);
+        // 解析 mapper 接口
         parser.parse();
         loadCompleted = true;
       } finally {
