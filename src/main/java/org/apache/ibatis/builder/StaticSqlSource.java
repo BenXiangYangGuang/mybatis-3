@@ -23,6 +23,12 @@ import org.apache.ibatis.mapping.SqlSource;
 import org.apache.ibatis.session.Configuration;
 
 /**
+ * DynamicSqlSource and RawSqlSource 都会最终 封装成为 StaticSqlSource
+ *
+ * DynamicSqlSource 与 StaticSqlSource 的主要区别：
+ * StaticSqlSource 中记录的 SQL 语句可能包含 "?" 占位符，但是可以直接交给数据库执行；
+ * DynamicSqlSource 中封装的 SQL 语句还需要一系列解析，才会最终形成数据库可执行的 SQL 语句。
+ *
  * @author Clinton Begin
  */
 public class StaticSqlSource implements SqlSource {

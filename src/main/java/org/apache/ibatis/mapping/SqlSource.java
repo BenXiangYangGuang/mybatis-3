@@ -26,7 +26,8 @@ package org.apache.ibatis.mapping;
  */
 public interface SqlSource {
 
-  //getBoundSql（）方法会根据映射文件或注解描述的 SQL 语句，以及传入的参敛，返回可执行的 SQL
+  //getBoundSql() 方法会根据映射文件或注解描述的 SQL 语句，以及传入的参敛，返回可执行的 SQL
+  // BoundSql其中封装了包含 ？”占位符的 SQL 语句，以及绑定的实参
   BoundSql getBoundSql(Object parameterObject);
 
 }
