@@ -26,9 +26,17 @@ import org.apache.ibatis.builder.BuilderException;
 /**
  * Caches OGNL parsed expressions.
  *
+ * OgnlCache 主要是用来解析 Mybatis 中 mapper.xml 文件中的表达式来使用。
+ *
+ * OGNL 是 Object-Graph Navigation Language 的缩写，从语言角度来说：它是一个功能强大的表达式语言(EL)，用来获取和设置 java 对象的属性 , 它旨在提供一个更高抽象度语法来对 java 对象图进行导航。
+ *
+ * Jsp 页面中的 jsp 标签就是一种表达语言。
+ *
  * OgnlCache 对原生 OGNL 进行了封装，OGNL 表达式解析过程比较耗时，为了提高效率，
  * OgnlCache 中使用 expressionCache 字段（静态成员，ConcurrentHashMap<String, Object> 对解析后的对象进行缓存。
  * ConcurrentHashMap 的吨 Object> 对解析 OGNL 达式进行 O
+ *
+ * Ognl : https://www.jianshu.com/p/86e00c1fee57
  *
  * @author Eduardo Macarron
  *

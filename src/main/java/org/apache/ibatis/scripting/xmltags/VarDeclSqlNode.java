@@ -16,11 +16,14 @@
 package org.apache.ibatis.scripting.xmltags;
 
 /**
+ * VarDeclSqlNode 表示的是动态 SQL 语句中的 <bind＞节点, 该节点可以从 OGNL 表达式中创建一个变量并将其记录到上下文中 。
  * @author Frank D. Martinez [mnesarco]
  */
 public class VarDeclSqlNode implements SqlNode {
 
+  // 记录＜bind>节点 name 属性值
   private final String name;
+  // 记录＜bind＞节点的 value 属性值
   private final String expression;
 
   public VarDeclSqlNode(String var, String exp) {
@@ -30,7 +33,9 @@ public class VarDeclSqlNode implements SqlNode {
 
   @Override
   public boolean apply(DynamicContext context) {
+    // 解析 OGNL 表达式的值
     final Object value = OgnlCache.getValue(expression, context.getBindings());
+    // 将 name 和 表达式的值存入 DynamicContext.bindings 集合中
     context.bind(name, value);
     return true;
   }

@@ -23,6 +23,7 @@ import org.apache.ibatis.scripting.ScriptingException;
 import org.apache.ibatis.type.SimpleTypeRegistry;
 
 /**
+ * TextSqlNode 表示的是包含 "${}" 占位符的动态 SQL 节点。
  * @author Clinton Begin
  */
 public class TextSqlNode implements SqlNode {
@@ -50,19 +51,30 @@ public class TextSqlNode implements SqlNode {
     return checker.isDynamic();
   }
 
+  /**
+   * apply() 方法会使用 GenericTokenParser 解析 "${}" 占位符，并直接替换成用户给定的实际参数值
+   * @param context
+   * @return
+   */
   @Override
   public boolean apply(DynamicContext context) {
     GenericTokenParser parser = createParser(new BindingTokenParser(context, injectionFilter));
+    // 将解析后的 SQL 放入 DynamicContext.sqlBuilder 中。
     context.appendSql(parser.parse(text));
     return true;
   }
 
   private GenericTokenParser createParser(TokenHandler handler) {
+    // 解析的是”${}”占位符
     return new GenericTokenParser("${", "}", handler);
   }
 
+  /**
+   * BindingTokenParser 继承了 TokenHandler 接口，
+   * 它的主要功能是根据 DynamicContext.bindings 集合中的信息解析 SQL 语句节点中的 "${}" 占位符。
+   */
   private static class BindingTokenParser implements TokenHandler {
-
+    // context 指向了 DynamicContext 对象
     private DynamicContext context;
     private Pattern injectionFilter;
 
@@ -73,14 +85,17 @@ public class TextSqlNode implements SqlNode {
 
     @Override
     public String handleToken(String content) {
+      // 获取用户提供的实参
       Object parameter = context.getBindings().get("_parameter");
       if (parameter == null) {
         context.getBindings().put("value", null);
       } else if (SimpleTypeRegistry.isSimpleType(parameter.getClass())) {
         context.getBindings().put("value", parameter);
       }
+      // 通过 OGNL 解析 content 的值
       Object value = OgnlCache.getValue(content, context.getBindings());
       String srtValue = value == null ? "" : String.valueOf(value); // issue #274 return "" instead of "null"
+      // 检测合法性
       checkInjection(srtValue);
       return srtValue;
     }

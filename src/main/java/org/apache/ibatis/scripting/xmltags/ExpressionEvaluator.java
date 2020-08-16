@@ -24,15 +24,19 @@ import java.util.Map;
 import org.apache.ibatis.builder.BuilderException;
 
 /**
+ * 用于处理 <if test=""></if> 节点中 test 属性表达式 true or false
  * @author Clinton Begin
  */
 public class ExpressionEvaluator {
 
   public boolean evaluateBoolean(String expression, Object parameterObject) {
+    // 通过 OGNL 解析表达式的值
     Object value = OgnlCache.getValue(expression, parameterObject);
+    // 处理 Boolean 类型
     if (value instanceof Boolean) {
       return (Boolean) value;
     }
+    // 处理数字类型
     if (value instanceof Number) {
       return new BigDecimal(String.valueOf(value)).compareTo(BigDecimal.ZERO) != 0;
     }

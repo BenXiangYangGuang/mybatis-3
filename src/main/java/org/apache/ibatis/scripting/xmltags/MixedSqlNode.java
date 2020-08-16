@@ -18,6 +18,8 @@ package org.apache.ibatis.scripting.xmltags;
 import java.util.List;
 
 /**
+ * MixedSqlNode 中使用 contents 字段（List Sq!Node＞类型）记录其子节点对应的 SqlNode 对象集合，
+ * 其 apply() 方法会循环调用 contents 集合中所有 SqlNode 对象的 apply() 方法.
  * @author Clinton Begin
  */
 public class MixedSqlNode implements SqlNode {

@@ -30,7 +30,7 @@ import org.apache.ibatis.session.Configuration;
 
 /**
  * MappedStatement 表示映射配置文件中定义 SQL 节点;
- * insert、update、delete、select sql语句的包装对象
+ * insert、update、delete、select sql语句节点的封装对象
  *
  * @author Clinton Begin
  */
