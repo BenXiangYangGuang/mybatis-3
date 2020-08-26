@@ -52,6 +52,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+/**
+ * sql 语句查询结果，映射为 <resultMap> 和 <resultSet> 节点定义的数据集合
+ */
 @ExtendWith(MockitoExtension.class)
 class DefaultResultSetHandlerTest {
 
@@ -74,6 +77,7 @@ class DefaultResultSetHandlerTest {
   @Test
   void shouldRetainColumnNameCase() throws Exception {
 
+    // mapper.xml 中， select | insert | update | delete Sql 语句节点存储对象
     final MappedStatement ms = getMappedStatement();
 
     final Executor executor = null;
@@ -82,7 +86,7 @@ class DefaultResultSetHandlerTest {
     final BoundSql boundSql = null;
     final RowBounds rowBounds = new RowBounds(0, 100);
     final DefaultResultSetHandler fastResultSetHandler = new DefaultResultSetHandler(executor, ms, parameterHandler, resultHandler, boundSql, rowBounds);
-
+    // 给定一些假定情况，遇到什么值，返回相应定义好的数据
     when(stmt.getResultSet()).thenReturn(rs);
     when(rs.getMetaData()).thenReturn(rsmd);
     when(rs.getType()).thenReturn(ResultSet.TYPE_FORWARD_ONLY);

@@ -59,6 +59,21 @@ public class XMLStatementBuilder extends BaseBuilder {
    * 	<select id="selectAllAuthors" resultType="org.apache.ibatis.domain.blog.Author">
    * 		select * from author
    * 	</select>
+   *
+   *
+   * 	<insert id="insertAuthor" parameterType="org.apache.ibatis.domain.blog.Author">
+   * 		<selectKey keyProperty="id" resultType="_int" order="BEFORE">
+   * 			<include refid="selectNum">
+   * 				<property name="num" value="1"/>
+   * 			</include>
+   * 		</selectKey>
+   * 		insert into Author (username,password,email,bio)
+   * 		values (#{username},#{password},#{email},#{bio})
+   * 	</insert>
+   *
+   * 	<sql id="selectNum">
+   * 		SELECT #{num}
+   * 	</sql>
    */
   public void parseStatementNode() {
     // <select> 节点 Id
@@ -104,10 +119,11 @@ public class XMLStatementBuilder extends BaseBuilder {
     String keyStatementId = id + SelectKeyGenerator.SELECT_KEY_SUFFIX;
     keyStatementId = builderAssistant.applyCurrentNamespace(keyStatementId, true);
     //检测 SQL 节点中 是否 配置了 <selectKey> 节点、SQL 节点的 useGeneratedKeys 属性值；
-    //mybatis-config.xml 中全局的 useGeneratedKeys 配置，以及是否为 insert 语句，决定使用的 keyGenerator 实现
+    // <insert> <update> 节点中的 <selectKey> 节点指定了获取数据库主键的方式；
     if (configuration.hasKeyGenerator(keyStatementId)) {
       keyGenerator = configuration.getKeyGenerator(keyStatementId);
     } else {
+      // 根据 SQL 节点的 useGeneratedKeys 属性值、mybatis-config.xml 中全局的 useGeneratedKeys 配置，以及是否是 insert 语句，决定使用 keyGenerator 的具体接口实现
       keyGenerator = context.getBooleanAttribute("useGeneratedKeys",
           configuration.isUseGeneratedKeys() && SqlCommandType.INSERT.equals(sqlCommandType))
           ? Jdbc3KeyGenerator.INSTANCE : NoKeyGenerator.INSTANCE;

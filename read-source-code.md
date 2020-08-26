@@ -23,3 +23,7 @@ My Batis 中所有的类型转换器都继承了 TypeHandler 接口，规定了j
 ##### TypeReference
 ##### TypeHandlerRegistry
 TypeHandlerRegistry负责管理这些TypeHandler，mybatis系统初始化，会为已知的TypeHandler创建对象，并注册到TypeHandlerRegistry中
+
+
+#### KeyGenerator
+insert 语句 id 自增主键生成策略

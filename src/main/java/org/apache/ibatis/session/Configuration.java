@@ -159,7 +159,8 @@ public class Configuration {
   protected final Map<String, ResultMap> resultMaps = new StrictMap<>("Result Maps collection");
   // key org.apache.ibatis.domain.blog.mappers.AuthorMapper.selectAuthor ParameterMap
   protected final Map<String, ParameterMap> parameterMaps = new StrictMap<>("Parameter Maps collection");
-  protected final Map<String, KeyGenerator> keyGenerators = new StrictMap<>("Key Generators collection"); // <selectKey> 节点保存集合，selectKey 用来 insert | update 生成主键 Id；
+  // <selectKey> 节点保存集合，selectKey 用来 insert | update 生成主键 Id；key 是 mapper.xml 文件 namespace + insert 节点 Id 属性; value 是 insert id 自增主键的生成策略接口
+  protected final Map<String, KeyGenerator> keyGenerators = new StrictMap<>("Key Generators collection");
   // 包含 mapper.xml 和 AuthorMapper 接口
   protected final Set<String> loadedResources = new HashSet<>(); // namespace:mapper.xml 已经加载的集合
   protected final Map<String, XNode> sqlFragments = new StrictMap<>("XML fragments parsed from previous mappers"); // sql 片段

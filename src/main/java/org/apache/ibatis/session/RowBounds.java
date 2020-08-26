@@ -16,11 +16,13 @@
 package org.apache.ibatis.session;
 
 /**
+ * row 的条数，相当于 limit 0，100
  * @author Clinton Begin
  */
 public class RowBounds {
-
+  //起始行
   public static final int NO_ROW_OFFSET = 0;
+  //总行数
   public static final int NO_ROW_LIMIT = Integer.MAX_VALUE;
   public static final RowBounds DEFAULT = new RowBounds();
 

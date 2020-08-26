@@ -42,6 +42,17 @@ import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.TypeHandlerRegistry;
 
 /**
+ *
+ * Jdbc3KeyGenerator 用于取回数据库 生成的自增 id,对应 mybatis-config.xml 配置文件中的 useGeneratedKeys 全局配置，以及 insert 节点中 useGeneratedKeys 属性。
+ *
+ * // TODO: 2020/8/26 319页 有图
+ * <insert id="test_insert" u seGeneratedKeys="true" keyProperty＝”id”〉
+    INSERT INTO t_user(username , pwd) VALUES
+     <foreach item= "item" collection=” list” separator=”,”>
+        (#(item.username}, #(item.pwd})
+     </foreach>
+ * </insert>
+ *
  * @author Clinton Begin
  * @author Kazuki Shimizu
  */
@@ -67,6 +78,14 @@ public class Jdbc3KeyGenerator implements KeyGenerator {
     processBatch(ms, stmt, parameter);
   }
 
+  /**
+   * 在 PreparedStatement 执行完 update 之后，将 SQL 语句执行后生成的主键记录到用户传递的时参数中。
+   * 一般情况下，对应单行插入操作，传入的实参是一个 JavaBean 对象 或是 Map 对象，则将对象对应一次插入操作的内容；
+   * 对于多行插入， 传入的实参可以是对象或 Map 对象的数组或集合，集合每一个元素都对应一次插操作。
+   * @param ms
+   * @param stmt
+   * @param parameter
+   */
   public void processBatch(MappedStatement ms, Statement stmt, Object parameter) {
     final String[] keyProperties = ms.getKeyProperties();
     if (keyProperties == null || keyProperties.length == 0) {
@@ -85,6 +104,15 @@ public class Jdbc3KeyGenerator implements KeyGenerator {
     }
   }
 
+  /**
+   * 处理不同类型 结果实参；Map 类型、ArrayList 类型 等等
+   * @param configuration
+   * @param rs sql 执行结果集合
+   * @param rsmd ResultSet 结果集合的每列的元属性，
+   * @param keyProperties  指定的自增主键 Id 对应 Java 对象属性
+   * @param parameter sql 数据库执行之后，数据库传回的参数
+   * @throws SQLException
+   */
   @SuppressWarnings("unchecked")
   private void assignKeys(Configuration configuration, ResultSet rs, ResultSetMetaData rsmd, String[] keyProperties,
       Object parameter) throws SQLException {
@@ -101,6 +129,15 @@ public class Jdbc3KeyGenerator implements KeyGenerator {
     }
   }
 
+  /**
+   * 处理 Java 对象或者 Bean 对象，非集合对象，单条数据情况
+   * @param configuration
+   * @param rs
+   * @param rsmd
+   * @param keyProperties
+   * @param parameter
+   * @throws SQLException
+   */
   private void assignKeysToParam(Configuration configuration, ResultSet rs, ResultSetMetaData rsmd,
       String[] keyProperties, Object parameter) throws SQLException {
     Collection<?> params = collectionize(parameter);
@@ -121,6 +158,15 @@ public class Jdbc3KeyGenerator implements KeyGenerator {
     }
   }
 
+  /**
+   * 处理 List 类型，遍历数据库生成的主键结果集，并设置到 Parameters 集合对应的元素的属性中
+   * @param configuration
+   * @param rs
+   * @param rsmd
+   * @param keyProperties
+   * @param paramMapList
+   * @throws SQLException
+   */
   private void assignKeysToParamMapList(Configuration configuration, ResultSet rs, ResultSetMetaData rsmd,
       String[] keyProperties, ArrayList<ParamMap<?>> paramMapList) throws SQLException {
     Iterator<ParamMap<?>> iterator = paramMapList.iterator();
@@ -143,6 +189,15 @@ public class Jdbc3KeyGenerator implements KeyGenerator {
     }
   }
 
+  /**
+   * 处理 Map 类型，遍历数据库生成的主键结果集，并设置到 Parameters 集合对应的元素的属性中
+   * @param configuration
+   * @param rs
+   * @param rsmd
+   * @param keyProperties
+   * @param paramMap
+   * @throws SQLException
+   */
   private void assignKeysToParamMap(Configuration configuration, ResultSet rs, ResultSetMetaData rsmd,
       String[] keyProperties, Map<String, ?> paramMap) throws SQLException {
     if (paramMap.isEmpty()) {
@@ -210,6 +265,11 @@ public class Jdbc3KeyGenerator implements KeyGenerator {
     return paramMap.keySet().iterator().next();
   }
 
+  /**
+   * 参数对象集合化
+   * @param param
+   * @return
+   */
   private static Collection<?> collectionize(Object param) {
     if (param instanceof Collection) {
       return (Collection<?>) param;
