@@ -33,6 +33,8 @@ import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
 /**
+ * SimpleStatementHandler 继承了 BaseStatementHandler 抽象类。它底层使用 java.sql.Statement 对象来完成数据库的相关操作.
+ * 所以 SQL 语句中不能存在占位符,相应的，SimpleStatementHandler.parameterize() 方法是空实现。
  * @author Clinton Begin
  */
 public class SimpleStatementHandler extends BaseStatementHandler {
@@ -43,19 +45,26 @@ public class SimpleStatementHandler extends BaseStatementHandler {
 
   @Override
   public int update(Statement statement) throws SQLException {
+    //获取 SQL 语句
     String sql = boundSql.getSql();
+    //获取用户传入的实参
     Object parameterObject = boundSql.getParameterObject();
     KeyGenerator keyGenerator = mappedStatement.getKeyGenerator();
     int rows;
     if (keyGenerator instanceof Jdbc3KeyGenerator) {
+      // 执行 SQL 语句
       statement.execute(sql, Statement.RETURN_GENERATED_KEYS);
+      // 获取受影响的行数
       rows = statement.getUpdateCount();
+      // 将数据库生成的主键添加到 parameterObject 中
       keyGenerator.processAfter(executor, mappedStatement, statement, parameterObject);
     } else if (keyGenerator instanceof SelectKeyGenerator) {
       statement.execute(sql);
       rows = statement.getUpdateCount();
+      // 执行 <selectKey> 节点中配置的 SQL 语句获取数据库生成的主键，并添加到 parameterObject 中
       keyGenerator.processAfter(executor, mappedStatement, statement, parameterObject);
     } else {
+      // update、delete 语句
       statement.execute(sql);
       rows = statement.getUpdateCount();
     }
@@ -70,8 +79,11 @@ public class SimpleStatementHandler extends BaseStatementHandler {
 
   @Override
   public <E> List<E> query(Statement statement, ResultHandler resultHandler) throws SQLException {
+    // 获取 SQL 语句
     String sql = boundSql.getSql();
+    // 调用 Statement.executor()方法执行 SQL 语句
     statement.execute(sql);
+    // 映射结果集
     return resultSetHandler.handleResultSets(statement);
   }
 
@@ -82,6 +94,12 @@ public class SimpleStatementHandler extends BaseStatementHandler {
     return resultSetHandler.handleCursorResultSets(statement);
   }
 
+  /**
+   * instantiateStatement 方法直接通过 JDB Connection 创建 statement 对象
+   * @param connection
+   * @return
+   * @throws SQLException
+   */
   @Override
   protected Statement instantiateStatement(Connection connection) throws SQLException {
     if (mappedStatement.getResultSetType() == ResultSetType.DEFAULT) {

@@ -34,20 +34,29 @@ import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.type.TypeHandlerRegistry;
 
 /**
+ *
  * @author Clinton Begin
  */
 public abstract class BaseStatementHandler implements StatementHandler {
 
   protected final Configuration configuration;
+  // 对象工厂，创建对象来使用
   protected final ObjectFactory objectFactory;
+  // 类型转换注册器
   protected final TypeHandlerRegistry typeHandlerRegistry;
+  // SQL 查询结果，封装成 ResultMap 对象 处理器
   protected final ResultSetHandler resultSetHandler;
+  // 记录使用的 ParameterHandler 对象， ParameterHandler 的主要功能是为 SQL 句绑定实参 ，使用实参替换 SQL 吾句的中 ? 占位符。
   protected final ParameterHandler parameterHandler;
 
+  // sql 执行器
   protected final Executor executor;
+  // 封装 mapper.xml <SQL> 节点 成 MappedStatement 对象
   protected final MappedStatement mappedStatement;
+  //  RowBounds 记录了用户设置的 offset limit ，用于在结采集中定位映射的起始位置和结束位置
   protected final RowBounds rowBounds;
 
+  // 数据库可以执行的 SQL 语句
   protected BoundSql boundSql;
 
   protected BaseStatementHandler(Executor executor, MappedStatement mappedStatement, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) {
@@ -60,6 +69,7 @@ public abstract class BaseStatementHandler implements StatementHandler {
     this.objectFactory = configuration.getObjectFactory();
 
     if (boundSql == null) { // issue #435, get the key before calculating the statement
+      // 调用 KeyGenerator processBefore() 方法获取主键
       generateKeys(parameterObject);
       boundSql = mappedStatement.getBoundSql(parameterObject);
     }
@@ -80,13 +90,23 @@ public abstract class BaseStatementHandler implements StatementHandler {
     return parameterHandler;
   }
 
+  /**
+   * 获取 Statement 对象
+   * @param connection
+   * @param transactionTimeout
+   * @return
+   * @throws SQLException
+   */
   @Override
   public Statement prepare(Connection connection, Integer transactionTimeout) throws SQLException {
     ErrorContext.instance().sql(boundSql.getSql());
     Statement statement = null;
     try {
+      // 初始化 java.sql.Statement 对象
       statement = instantiateStatement(connection);
+      // 设置超时时间
       setStatementTimeout(statement, transactionTimeout);
+      // 设置 java.sql.Statement的 fetchSize 属性，示意 jdbc 驱动程序，当数据库查询结果很多时，java.sql.Statement 获取多少行的结果，并封装为 mybatis 的 ResultMap 对象。
       setFetchSize(statement);
       return statement;
     } catch (SQLException e) {
@@ -100,6 +120,12 @@ public abstract class BaseStatementHandler implements StatementHandler {
 
   protected abstract Statement instantiateStatement(Connection connection) throws SQLException;
 
+  /**
+   * 设置 statement 对象执行 Sql 超时时间
+   * @param stmt
+   * @param transactionTimeout
+   * @throws SQLException
+   */
   protected void setStatementTimeout(Statement stmt, Integer transactionTimeout) throws SQLException {
     Integer queryTimeout = null;
     if (mappedStatement.getTimeout() != null) {
@@ -135,6 +161,10 @@ public abstract class BaseStatementHandler implements StatementHandler {
     }
   }
 
+  /**
+   * 获取自增的 id 主键
+   * @param parameter
+   */
   protected void generateKeys(Object parameter) {
     KeyGenerator keyGenerator = mappedStatement.getKeyGenerator();
     ErrorContext.instance().store();

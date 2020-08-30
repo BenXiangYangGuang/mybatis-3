@@ -30,6 +30,8 @@ import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
 /**
+ * RoutingStatementHandler 会根据 MappedStatement 指定的 statementType 宇段，创建对应的 StatementHandler 接口实现。
+ * 定义一个 StatementHandler 接口 代理对象，根据 statementType 类型，创建 StatementHandler 接口具体实现，有点像策略模式
  * @author Clinton Begin
  */
 public class RoutingStatementHandler implements StatementHandler {

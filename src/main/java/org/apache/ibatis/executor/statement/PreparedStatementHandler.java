@@ -33,6 +33,8 @@ import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
 /**
+ * PreparedStatementHandler 底层依赖于 java.sq1.PreparedStatement 象来完成数据库的相关操。
+ * 在 SimpleStatementHandler.parameterize() 方法中， 会调用前面介绍的 ParameterHandler.setParameters() 方法完成 SQL 语句的参数绑定。
  * @author Clinton Begin
  */
 public class PreparedStatementHandler extends BaseStatementHandler {
@@ -74,17 +76,22 @@ public class PreparedStatementHandler extends BaseStatementHandler {
 
   @Override
   protected Statement instantiateStatement(Connection connection) throws SQLException {
+    //获取待执行的 SQL 语句
     String sql = boundSql.getSql();
+    //根据 MappedStatement.keyGenerator 字段的位，创建 PreparedStatement 对象
     if (mappedStatement.getKeyGenerator() instanceof Jdbc3KeyGenerator) {
       String[] keyColumnNames = mappedStatement.getKeyColumns();
       if (keyColumnNames == null) {
-        return connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+        return connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS); // 返回数据库生成的主键
       } else {
+        // 在 insert 语句执行完成之后，会将 keyColumn 指定的列对象
         return connection.prepareStatement(sql, keyColumnNames);
       }
     } else if (mappedStatement.getResultSetType() == ResultSetType.DEFAULT) {
+      //创建普通的 PreparedStatement 对象
       return connection.prepareStatement(sql);
     } else {
+      //设置结果集是否可以滚动以及其游标是否可以上下移动，设置结采集是否可更新
       return connection.prepareStatement(sql, mappedStatement.getResultSetType().getValue(), ResultSet.CONCUR_READ_ONLY);
     }
   }

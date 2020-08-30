@@ -39,6 +39,9 @@ public final class MappedStatement {
   private String resource;  // namespace + id
   private Configuration configuration;
   private String id;
+  // java.sql.Statement的 fetchSize 属性，示意 jdbc 驱动程序，
+  // 当数据库查询结果很多时，java.sql.Statement 获取多少行的结果，并封装为 mybatis 的 ResultMap 对象。
+  //https://tkstone.blog/2018/11/07/handling-big-data-on-mybatis/
   private Integer fetchSize;
   private Integer timeout;
   private StatementType statementType;
@@ -297,6 +300,11 @@ public final class MappedStatement {
     return resultSets;
   }
 
+  /**
+   * 获取 数据库可执行 SQL
+   * @param parameterObject
+   * @return
+   */
   public BoundSql getBoundSql(Object parameterObject) {
     BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
     List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();

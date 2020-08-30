@@ -20,7 +20,7 @@ import java.sql.SQLException;
 
 /**
  * A parameter handler sets the parameters of the {@code PreparedStatement}.
- *
+ * ParameterHandler 是一个 SQL 实参处理器，主要功能是为 SQL 语句 绑定实参，使用传入的实参替换 SQL 吾句的中 ? 占位符。
  * @author Clinton Begin
  */
 public interface ParameterHandler {
