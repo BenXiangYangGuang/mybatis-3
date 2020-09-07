@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2019 the original author or authors.
+ *    Copyright 2009-2020 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -40,17 +40,29 @@ public class SimpleExecutor extends BaseExecutor {
     super(configuration, transaction);
   }
 
+  /**
+   *
+   * @param ms
+   * @param parameter 用户实参
+   * @return
+   * @throws SQLException
+   */
   @Override
   public int doUpdate(MappedStatement ms, Object parameter) throws SQLException {
     Statement stmt = null;
     try {
       Configuration configuration = ms.getConfiguration();
+      // 创建 StatementHandler 对象，StatementHandler 在创建 Statement 对象
+      // 实际返回 RoutingStatementHandler 对象，根据 statementType 选择具体的 StatementHandler 实现
       StatementHandler handler = configuration.newStatementHandler(this, ms, parameter, RowBounds.DEFAULT, null, null);
+      // 处理占位符
       stmt = prepareStatement(handler, ms.getStatementLog());
+      // StatementHandler 对象执行 Statement，从而执行 SQL 语句
       return handler.update(stmt);
     } finally {
       closeStatement(stmt);
     }
+
   }
 
   @Override
@@ -60,6 +72,7 @@ public class SimpleExecutor extends BaseExecutor {
       Configuration configuration = ms.getConfiguration();
       StatementHandler handler = configuration.newStatementHandler(wrapper, ms, parameter, rowBounds, resultHandler, boundSql);
       stmt = prepareStatement(handler, ms.getStatementLog());
+      // 调用 StatementHandler.query() 方法，执行 SQL 语句，并通过 ResultSetHandler 完成结果集映射
       return handler.query(stmt, resultHandler);
     } finally {
       closeStatement(stmt);
@@ -76,15 +89,29 @@ public class SimpleExecutor extends BaseExecutor {
     return cursor;
   }
 
+  /**
+   * SimpleExecutor 不提供批量处理 SQL 语句的功能，所以其 doFlushStatements() 方法直接返回空集合，不做其他任何操作。
+   * @param isRollback
+   * @return
+   */
   @Override
   public List<BatchResult> doFlushStatements(boolean isRollback) {
     return Collections.emptyList();
   }
 
+  /**
+   * 获取 Statement 对象
+   * @param handler
+   * @param statementLog
+   * @return
+   * @throws SQLException
+   */
   private Statement prepareStatement(StatementHandler handler, Log statementLog) throws SQLException {
     Statement stmt;
     Connection connection = getConnection(statementLog);
+    // 创建 Statement 对象
     stmt = handler.prepare(connection, transaction.getTimeout());
+    // 处理 "?" 占位符
     handler.parameterize(stmt);
     return stmt;
   }

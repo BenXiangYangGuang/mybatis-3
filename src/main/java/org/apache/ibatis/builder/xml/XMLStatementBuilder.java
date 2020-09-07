@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2019 the original author or authors.
+ *    Copyright 2009-2020 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -124,8 +124,7 @@ public class XMLStatementBuilder extends BaseBuilder {
       keyGenerator = configuration.getKeyGenerator(keyStatementId);
     } else {
       // 根据 SQL 节点的 useGeneratedKeys 属性值、mybatis-config.xml 中全局的 useGeneratedKeys 配置，以及是否是 insert 语句，决定使用 keyGenerator 的具体接口实现
-      keyGenerator = context.getBooleanAttribute("useGeneratedKeys",
-          configuration.isUseGeneratedKeys() && SqlCommandType.INSERT.equals(sqlCommandType))
+      keyGenerator = context.getBooleanAttribute("useGeneratedKeys",configuration.isUseGeneratedKeys() && SqlCommandType.INSERT.equals(sqlCommandType))
           ? Jdbc3KeyGenerator.INSTANCE : NoKeyGenerator.INSTANCE;
     }
 

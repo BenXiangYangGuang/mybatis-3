@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2019 the original author or authors.
+ *    Copyright 2009-2020 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ import org.apache.ibatis.type.TypeHandlerRegistry;
  * Jdbc3KeyGenerator 用于取回数据库 生成的自增 id,对应 mybatis-config.xml 配置文件中的 useGeneratedKeys 全局配置，以及 insert 节点中 useGeneratedKeys 属性。
  *
  * // TODO: 2020/8/26 319页 有图
- * <insert id="test_insert" u seGeneratedKeys="true" keyProperty＝”id”〉
+ * <insert id="test_insert" useGeneratedKeys="true" keyProperty＝”id”〉
     INSERT INTO t_user(username , pwd) VALUES
      <foreach item= "item" collection=” list” separator=”,”>
         (#(item.username}, #(item.pwd})

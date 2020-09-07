@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2018 the original author or authors.
+ *    Copyright 2009-2020 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import java.util.List;
 import org.apache.ibatis.mapping.MappedStatement;
 
 /**
+ * BatchExecutor 要批量执行的，一个 SQL 的结果
  * @author Jeff Butler
  */
 public class BatchResult {
@@ -28,7 +29,7 @@ public class BatchResult {
   private final MappedStatement mappedStatement;
   private final String sql;
   private final List<Object> parameterObjects;
-
+  // 一个 Statement ，包含多条 SQL 语句，数组元素为每条 SQL 语句更新的 行数
   private int[] updateCounts;
 
   public BatchResult(MappedStatement mappedStatement, String sql) {

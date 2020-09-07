@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2019 the original author or authors.
+ *    Copyright 2009-2020 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -27,9 +27,9 @@ import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.RowBounds;
 
 /**
- * 对于不支持自动生成自增主键的数据库，例如 Oracle 数据库，用户可以利用 MyBatis 提供 的 SelectkeyGenerator 来生成主键， SelectkeyGenerator 也可以实现类似于 Jdbc3KeyGenerator 提供的、获取数据库自动生成的主键的功能。
+ * 对于不支持自动生成自增主键的数据库，例如 Oracle 数据库，用户可以利用 MyBatis 提供 的 SelectkeyGenerator 来生成主键， SelectKeyGenerator 也可以实现类似于 Jdbc3KeyGenerator 提供的、获取数据库自动生成的主键的功能。
  *
- * SelectkeyGenerator 主要用于生成主键，它会执行映射配置文件中定义的＜selectKey＞节点的 SQL 语句，该语句会获取 insert 语句所需要的主键。
+ * SelectKeyGenerator 主要用于生成主键，它会执行映射配置文件中定义的＜selectKey＞节点的 SQL 语句，该语句会获取 insert 语句所需要的主键。
  *
  * @author Clinton Begin
  * @author Jeff Butler
@@ -59,7 +59,7 @@ public class SelectKeyGenerator implements KeyGenerator {
       processGeneratedKeys(executor, ms, parameter);
     }
   }
-  // TODO: 2020/8/26 322页 有图 
+  // TODO: 2020/8/26 322页 有图
   /**
    * <insert id="insert">
    *     <!-- 在 insert 语句执行之前，先通过执行 <selectKey＞节点对应的 Select 语句生成 insert 语句中使用的主键，也就是这里的 id -->

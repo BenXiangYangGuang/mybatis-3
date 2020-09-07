@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2019 the original author or authors.
+ *    Copyright 2009-2020 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -47,10 +47,10 @@ public final class MappedStatement {
   private StatementType statementType;
   private ResultSetType resultSetType;
   private SqlSource sqlSource; // mapper 中的 sql 语句节点 insert、update、delete、select;最终可以执行的 sql 语句，只包含 ？ 占位符
-  private Cache cache;
+  private Cache cache; // 对应 namespace 的二级缓存空间
   private ParameterMap parameterMap;
   private List<ResultMap> resultMaps;
-  private boolean flushCacheRequired;
+  private boolean flushCacheRequired;  // 是否刷新缓存
   private boolean useCache;
   private boolean resultOrdered;
   // sql 语句类型 UNKNOWN, INSERT, UPDATE, DELETE, SELECT, FLUSH

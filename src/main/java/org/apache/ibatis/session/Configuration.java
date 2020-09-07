@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2019 the original author or authors.
+ *    Copyright 2009-2020 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -117,6 +117,7 @@ public class Configuration {
   protected String logPrefix;
   protected Class<? extends Log> logImpl;
   protected Class<? extends VFS> vfsImpl;
+  // 一级缓存范围
   protected LocalCacheScope localCacheScope = LocalCacheScope.SESSION;
   protected JdbcType jdbcTypeForNull = JdbcType.OTHER;
   protected Set<String> lazyLoadTriggerMethods = new HashSet<>(Arrays.asList("equals", "clone", "hashCode", "toString"));
@@ -596,8 +597,19 @@ public class Configuration {
     return resultSetHandler;
   }
 
+  /**
+   * 创建 StatementHandler 对象
+   * @param executor
+   * @param mappedStatement
+   * @param parameterObject
+   * @param rowBounds
+   * @param resultHandler
+   * @param boundSql
+   * @return
+   */
   public StatementHandler newStatementHandler(Executor executor, MappedStatement mappedStatement, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) {
     StatementHandler statementHandler = new RoutingStatementHandler(executor, mappedStatement, parameterObject, rowBounds, resultHandler, boundSql);
+    // 加载插件
     statementHandler = (StatementHandler) interceptorChain.pluginAll(statementHandler);
     return statementHandler;
   }

@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2018 the original author or authors.
+ *    Copyright 2009-2020 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -34,6 +34,8 @@ import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.transaction.Transaction;
 
 /**
+ * 在传统的 JDBC 编程中，重用 Statement 对象是常用的一种优化手段，该优化手段可以减少 SQL 预编译的开销以及创建和销毁 Statement 对象的开销，从而提高性能。
+ * ReuseExecutor 提供了 Statement 重用功能，ReuseExecutor 中通过 statementMap 字段 缓存使用过的 Statement 对象，key 是 SQL 语句，value 是 SQL 对应的 Statement 对象。
  * @author Clinton Begin
  */
 public class ReuseExecutor extends BaseExecutor {
@@ -60,6 +62,7 @@ public class ReuseExecutor extends BaseExecutor {
     return handler.query(stmt, resultHandler);
   }
 
+  // TODO: 2020/9/3 游标缓存，相同 SQL 多次查询，会导致前一个查询的结果集 DefaultCursor 被关闭，344 page
   @Override
   protected <E> Cursor<E> doQueryCursor(MappedStatement ms, Object parameter, RowBounds rowBounds, BoundSql boundSql) throws SQLException {
     Configuration configuration = ms.getConfiguration();
@@ -68,27 +71,52 @@ public class ReuseExecutor extends BaseExecutor {
     return handler.queryCursor(stmt);
   }
 
+  // TODO: 2020/9/3  提交或回滚
+
+  /**
+   *
+   * 当事务提交或回滚、连接关闭时，都需要关闭这些缓存的 Statement 对象。前面介绍
+   * BaseExecutor.commit()、 rollback() 和 close()方法时提到，其中都会调用 doFlushStatements（）方法，所以在该方法 实现关 Statement 对象的逻辑非常合适。
+   * @param isRollback
+   * @return
+   */
   @Override
   public List<BatchResult> doFlushStatements(boolean isRollback) {
+    // 边历 statementMap 合并关闭其中的 Statement 对象
     for (Statement stmt : statementMap.values()) {
+      // 关闭 Statement 对象
       closeStatement(stmt);
     }
+    // 清空缓存
     statementMap.clear();
+    // 返回空集合
     return Collections.emptyList();
   }
 
+  /**
+   * 通过 statementMap 缓存获取 Statement，或者创建，或者从缓存中获取
+   * @param handler
+   * @param statementLog
+   * @return
+   * @throws SQLException
+   */
   private Statement prepareStatement(StatementHandler handler, Log statementLog) throws SQLException {
     Statement stmt;
     BoundSql boundSql = handler.getBoundSql();
-    String sql = boundSql.getSql();
+    String sql = boundSql.getSql();  // 可以执行的包含 "?" 占位符的 sql
+    // 缓存中是否存在 Statement 对象
     if (hasStatementFor(sql)) {
       stmt = getStatement(sql);
+      // 修改超时时间
       applyTransactionTimeout(stmt);
     } else {
       Connection connection = getConnection(statementLog);
+      // 创建 Statement 对象
       stmt = handler.prepare(connection, transaction.getTimeout());
+      // 放入缓存
       putStatement(sql, stmt);
     }
+    // 处理占位符
     handler.parameterize(stmt);
     return stmt;
   }

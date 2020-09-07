@@ -18,6 +18,7 @@ package org.apache.ibatis.cache.decorators;
 import org.apache.ibatis.cache.Cache;
 
 /**
+ * SynchronizedCache 是 Cache 的装饰器，装饰了线程安全的功能
  * @author Clinton Begin
  */
 public class SynchronizedCache implements Cache {

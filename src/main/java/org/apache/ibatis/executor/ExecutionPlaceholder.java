@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2015 the original author or authors.
+ *    Copyright 2009-2020 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 package org.apache.ibatis.executor;
 
 /**
+ * 查询数据库，将这个记录到缓存中国， key 为 SQL 语句，vaule 为 ExecutionPlaceholder Sql执行占位符
+ *
  * @author Clinton Begin
  */
 public enum ExecutionPlaceholder {

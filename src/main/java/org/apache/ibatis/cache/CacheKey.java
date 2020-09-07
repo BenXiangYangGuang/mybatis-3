@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2019 the original author or authors.
+ *    Copyright 2009-2020 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -23,6 +23,8 @@ import java.util.StringJoiner;
 import org.apache.ibatis.reflection.ArrayUtil;
 
 /**
+ * 创建缓存时，缓存 Key 的创建
+ * CacheKey 对象由 MappedStatement id 、对应的 offset limit SQL 语句（包含“？”占位符）、用户传递的实参以及 Environment id 这五部分构成
  * @author Clinton Begin
  */
 public class CacheKey implements Cloneable, Serializable {
@@ -66,6 +68,10 @@ public class CacheKey implements Cloneable, Serializable {
     return updateList.size();
   }
 
+  /**
+   * 添加 CacheKey 中 列属性
+   * @param object
+   */
   public void update(Object object) {
     int baseHashCode = object == null ? 1 : ArrayUtil.hashCode(object);
 
