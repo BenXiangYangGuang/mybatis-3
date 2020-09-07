@@ -32,6 +32,8 @@ import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.transaction.Transaction;
 
 /**
+ * SimpleExecutor 继承了 BaseExecutor 抽象类 它是最简单的 Executor 接口实现。Executor 使用了模板方法模式，一级缓存等固定不变的操作都封装到了 BaseExecutor 中，
+ * 在SimpleExecutor 中就不必再关系一级缓存等操作，只需要专注实现4个基本方法的实现即可。
  * @author Clinton Begin
  */
 public class SimpleExecutor extends BaseExecutor {

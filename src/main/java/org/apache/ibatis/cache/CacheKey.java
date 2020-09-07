@@ -23,7 +23,7 @@ import java.util.StringJoiner;
 import org.apache.ibatis.reflection.ArrayUtil;
 
 /**
- * 创建缓存时，缓存 Key 的创建
+ * 创建缓存时，缓存的 key。
  * CacheKey 对象由 MappedStatement id 、对应的 offset limit SQL 语句（包含“？”占位符）、用户传递的实参以及 Environment id 这五部分构成
  * @author Clinton Begin
  */

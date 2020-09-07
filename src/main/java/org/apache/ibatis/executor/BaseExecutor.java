@@ -235,7 +235,7 @@ public abstract class BaseExecutor implements Executor {
       // 一级缓存中已经记录了指定查询的结果对象，直接从缓存中加载对象，并设置到外层对象中
       deferredLoad.load();
     } else {
-      // 将 DeferredLoad 对象添加到 deferredLoads 队列中，待整个外层查询结束后，再加载改结果对象
+      // 将 DeferredLoad 对象添加到 deferredLoads 队列中，待整个外层查询结束后，再加载该结果对象
       deferredLoads.add(new DeferredLoad(resultObject, property, key, localCache, configuration, targetType));
     }
   }
@@ -446,7 +446,10 @@ public abstract class BaseExecutor implements Executor {
   }
 
   /**
-   * 从 localCache 缓存中，延迟加载结果对象
+   * 从 localCache 缓存中，延迟加载结果对象；
+   * 前面在分析嵌套查询时，如果一级缓存中缓存了嵌套查询的结果对象，则可以从一级缓存中直接加载该结果对象：如果一级缓存中记录的嵌套查询的结对象并未完全加载，则可以通过 DeferredLoad 实现类似延迟加载的功能。
+   * 针对一对多的嵌套查询，它只实现了懒查询，它并没有真正的去查询数据库
+   * https://blog.csdn.net/liuao107329/article/details/41829767
    */
   private static class DeferredLoad {
     // 外层对象对应的 MetaObject 对象

@@ -34,6 +34,8 @@ import org.apache.ibatis.logging.LogFactory;
  * Blocking cache support has been added. Therefore any get() that returns a cache miss
  * will be followed by a put() so any lock associated with the key can be released.
  *
+ * https://www.jianshu.com/p/e4f1f5b5fc9d P356 不可重复度问题，mybatis 二级缓存的事务隔离级别，好像装饰了 SynchronizedCache 这个缓存。
+ * https://juejin.im/post/6847902224975314958
  * @author Clinton Begin
  * @author Eduardo Macarron
  */

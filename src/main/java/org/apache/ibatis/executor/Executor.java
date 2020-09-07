@@ -55,7 +55,7 @@ public interface Executor {
   // 根据 CacheKey 对象查找缓存
   boolean isCached(MappedStatement ms, CacheKey key);
 
-  // 情况一级缓存
+  // 清空一级缓存
   void clearLocalCache();
   //延迟加载一级缓存中的数据
   void deferLoad(MappedStatement ms, MetaObject resultObject, String property, CacheKey key, Class<?> targetType);

@@ -40,19 +40,23 @@ import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.session.SqlSession;
 
 /**
+ * 在 DefaultSq!Session 中使用到了策略模式， DefaultSqlSession 扮演了 Context 的角色，而将所有数据库相关的操作全部封装到 Executor 接口实现中，并通过 executor 字段选择不同的 Executor 实现。
  * The default implementation for {@link SqlSession}.
  * Note that this class is not Thread-Safe.
  *
  * @author Clinton Begin
  */
 public class DefaultSqlSession implements SqlSession {
-
+  // 全局配置对象
   private final Configuration configuration;
+  // 底层依赖的 Executor
   private final Executor executor;
-
+  // 是否自动提交事务
   private final boolean autoCommit;
-  private boolean dirty; // TODO: 19-12-18  数据是否脏了
-  private List<Cursor<?>> cursorList; // ??
+  // 当前缓存中是否有脏数据
+  private boolean dirty;
+  // 为防止用户忘记关闭已打开的游标对象，会通过 cursorList 字段记录由该 SqlSession 对象生成的游标对象，在 DefaultSqlSession.close() 方法中会统一关闭这些游标对象
+  private List<Cursor<?>> cursorList;
 
   public DefaultSqlSession(Configuration configuration, Executor executor, boolean autoCommit) {
     this.configuration = configuration;
@@ -314,6 +318,11 @@ public class DefaultSqlSession implements SqlSession {
     cursorList.add(cursor);
   }
 
+  /**
+   * dirty 与 autoCommit 以及 用户传入的 force 参数共同决定是否提交或回滚事务
+   * @param force
+   * @return
+   */
   private boolean isCommitOrRollbackRequired(boolean force) {
     return (!autoCommit && dirty) || force;
   }

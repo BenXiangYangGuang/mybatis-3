@@ -36,6 +36,9 @@ import org.apache.ibatis.transaction.Transaction;
 /**
  * 在传统的 JDBC 编程中，重用 Statement 对象是常用的一种优化手段，该优化手段可以减少 SQL 预编译的开销以及创建和销毁 Statement 对象的开销，从而提高性能。
  * ReuseExecutor 提供了 Statement 重用功能，ReuseExecutor 中通过 statementMap 字段 缓存使用过的 Statement 对象，key 是 SQL 语句，value 是 SQL 对应的 Statement 对象。
+ *
+ * ReuseExecutor.doQuery()、 doQueryCursor()、 doUpdate() 方法的实现与 SimpleExecutor 对应方法的实现一样，区别在于其中调用的 prepareStatement() 方法， SimpleExecutor 每次都会通过
+ * JDBC Connection 创建新的 Statement 对象，而 ReuseExecutor 会先尝试重用 StatementMap 中缓存的 Statement 对象。
  * @author Clinton Begin
  */
 public class ReuseExecutor extends BaseExecutor {

@@ -32,6 +32,10 @@ import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 
 /**
+ * DefaultSqlSessionFactory 是一个具体工厂类，实现了 SqlSessionFactory 接口。DefaultSqlSessionFactory 主要提供了两种创建 DefaultSqlSession 对象的方式，
+ * 一种是通过数据源获取数据库连接，并创建 Executor 对象以及 DefaultSqlSession 对象。另一种方式是用户提供数据库连接对象， DefaultSqlSessionFactory 会使用该据库连接对象创建 Executor 对象 DefaultSqlSession 对象。
+ * SqlSessionFactory 负责创建 SqlSession 对象，其中只包含了多个 openSession() 方法的重载，
+ * 可以通过其参数指定事务的隔离级别、底层使用 Executor 的类型以及是否自动提交事务等方面的配置。
  * @author Clinton Begin
  */
 public class DefaultSqlSessionFactory implements SqlSessionFactory {
@@ -90,12 +94,18 @@ public class DefaultSqlSessionFactory implements SqlSessionFactory {
   private SqlSession openSessionFromDataSource(ExecutorType execType, TransactionIsolationLevel level, boolean autoCommit) {
     Transaction tx = null;
     try {
+      // 获取 mybatis-config.xml 配置文件中配置的 Environment 对象
       final Environment environment = configuration.getEnvironment();
+      // 获取 TransactionFactory
       final TransactionFactory transactionFactory = getTransactionFactoryFromEnvironment(environment);
+      // 创建 Transaction 对象
       tx = transactionFactory.newTransaction(environment.getDataSource(), level, autoCommit);
+      // 创建 Executor 对象
       final Executor executor = configuration.newExecutor(tx, execType);
+      // 创建 DefaultSqlSession 对象
       return new DefaultSqlSession(configuration, executor, autoCommit);
     } catch (Exception e) {
+      // 关闭 Transaction
       closeTransaction(tx); // may have fetched a connection so lets call close()
       throw ExceptionFactory.wrapException("Error opening session.  Cause: " + e, e);
     } finally {
@@ -107,10 +117,12 @@ public class DefaultSqlSessionFactory implements SqlSessionFactory {
     try {
       boolean autoCommit;
       try {
+        // 获取当前连接是否为自动提交
         autoCommit = connection.getAutoCommit();
       } catch (SQLException e) {
         // Failover to true, as most poor drivers
         // or databases won't support transactions
+        // 当前数据驱动提供的连接不支持事务，则可能抛出异常
         autoCommit = true;
       }
       final Environment environment = configuration.getEnvironment();
@@ -125,6 +137,11 @@ public class DefaultSqlSessionFactory implements SqlSessionFactory {
     }
   }
 
+  /**
+   * 获取 TransactionFactory 对象
+   * @param environment
+   * @return
+   */
   private TransactionFactory getTransactionFactoryFromEnvironment(Environment environment) {
     if (environment == null || environment.getTransactionFactory() == null) {
       return new ManagedTransactionFactory();
@@ -132,6 +149,10 @@ public class DefaultSqlSessionFactory implements SqlSessionFactory {
     return environment.getTransactionFactory();
   }
 
+  /**
+   * 关闭 Transaction
+   * @param tx
+   */
   private void closeTransaction(Transaction tx) {
     if (tx != null) {
       try {
