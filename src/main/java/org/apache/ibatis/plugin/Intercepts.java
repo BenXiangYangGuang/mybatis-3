@@ -22,6 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * 拦截器注解
  * The annotation that specify target methods to intercept.
  *
  * <b>How to use:</b>

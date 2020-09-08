@@ -19,12 +19,15 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
+ * 拦截器对象的包装，主要为了调用被拦截对象的真实需要的方法
  * @author Clinton Begin
  */
 public class Invocation {
-
+  // 被拦截对象
   private final Object target;
+  // 被拦截方法
   private final Method method;
+  // 被拦截方法参数
   private final Object[] args;
 
   public Invocation(Object target, Method method, Object[] args) {
@@ -45,6 +48,12 @@ public class Invocation {
     return args;
   }
 
+  /**
+   * 拦截器已经被调用，继续调用被拦截对象的真实需要的方法
+   * @return
+   * @throws InvocationTargetException
+   * @throws IllegalAccessException
+   */
   public Object proceed() throws InvocationTargetException, IllegalAccessException {
     return method.invoke(target, args);
   }

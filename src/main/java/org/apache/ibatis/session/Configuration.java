@@ -629,10 +629,11 @@ public class Configuration {
     } else {
       executor = new SimpleExecutor(this, transaction);
     }
+    // 是否开启二级缓存，装饰器模式
     if (cacheEnabled) {
       executor = new CachingExecutor(executor);
     }
-    //处理拦截器插件
+    // 通过interceptorChain.pluginAll() 方法创建 Executor 的代理对象
     executor = (Executor) interceptorChain.pluginAll(executor);
     return executor;
   }
