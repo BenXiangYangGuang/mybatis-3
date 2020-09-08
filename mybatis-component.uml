@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>org.apache.ibatis.session.defaults.DefaultSqlSession</OriginalElement>
+  <nodes>
+    <node x="0.0" y="1016.0">org.apache.ibatis.transaction.managed.ManagedTransaction</node>
+    <node x="0.0" y="515.0">org.apache.ibatis.executor.statement.PreparedStatementHandler</node>
+    <node x="560.5" y="714.0">org.apache.ibatis.executor.CachingExecutor</node>
+    <node x="472.0" y="1136.0">org.apache.ibatis.datasource.pooled.PooledDataSource</node>
+    <node x="0.0" y="817.0">org.apache.ibatis.executor.ReuseExecutor</node>
+    <node x="645.0" y="817.0">org.apache.ibatis.executor.BatchExecutor</node>
+    <node x="0.0" y="158.0">org.apache.ibatis.builder.SqlSourceBuilder</node>
+    <node x="922.0" y="1237.0">org.apache.ibatis.cache.impl.PerpetualCache</node>
+    <node x="1118.0" y="1357.0">org.apache.ibatis.cache.TransactionalCacheManager</node>
+    <node x="1392.0" y="1357.0">org.apache.ibatis.session.SqlSessionFactoryBuilder</node>
+    <node x="1156.0" y="1237.0">org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory</node>
+    <node x="951.0" y="1027.0">org.apache.ibatis.session.defaults.DefaultSqlSessionFactory</node>
+    <node x="1260.0" y="1028.0">org.apache.ibatis.session.SqlSessionManager</node>
+    <node x="321.0" y="817.0">org.apache.ibatis.executor.SimpleExecutor</node>
+    <node x="899.0" y="413.0">org.apache.ibatis.executor.statement.BaseStatementHandler</node>
+    <node x="1113.625" y="915.0">org.apache.ibatis.session.SqlSessionFactory</node>
+    <node x="466.0" y="1357.0">org.apache.ibatis.session.Configuration</node>
+    <node x="627.25" y="0.0">org.apache.ibatis.builder.BaseBuilder</node>
+    <node x="0.0" y="1357.0">org.apache.ibatis.datasource.unpooled.UnpooledDataSource</node>
+    <node x="1448.125" y="915.0">org.apache.ibatis.session.SqlSession</node>
+    <node x="1146.0" y="125.0">org.apache.ibatis.builder.xml.XMLMapperBuilder</node>
+    <node x="996.0" y="817.0">org.apache.ibatis.datasource.pooled.PooledDataSourceFactory</node>
+    <node x="395.5" y="915.0">org.apache.ibatis.transaction.Transaction</node>
+    <node x="516.75" y="613.0">org.apache.ibatis.executor.Executor</node>
+    <node x="974.0" y="1136.0">org.apache.ibatis.cache.Cache</node>
+    <node x="405.5" y="715.0">org.apache.ibatis.executor.BaseExecutor</node>
+    <node x="476.0" y="1016.0">org.apache.ibatis.transaction.jdbc.JdbcTransaction</node>
+    <node x="1289.0" y="1136.0">org.apache.ibatis.transaction.TransactionFactory</node>
+    <node x="1383.0" y="1237.0">org.apache.ibatis.transaction.managed.ManagedTransactionFactory</node>
+    <node x="781.0" y="103.0">org.apache.ibatis.builder.xml.XMLConfigBuilder</node>
+    <node x="1451.0" y="1016.0">org.apache.ibatis.session.defaults.DefaultSqlSession</node>
+    <node x="261.0" y="147.0">org.apache.ibatis.builder.xml.XMLStatementBuilder</node>
+    <node x="1133.5" y="311.0">org.apache.ibatis.executor.statement.StatementHandler</node>
+    <node x="1112.0" y="412.0">org.apache.ibatis.executor.statement.RoutingStatementHandler</node>
+    <node x="724.0" y="1357.0">org.apache.ibatis.datasource.pooled.PooledConnection</node>
+    <node x="1336.0" y="515.0">org.apache.ibatis.executor.statement.CallableStatementHandler</node>
+    <node x="1659.0" y="1357.0">org.apache.ibatis.mapping.MappedStatement</node>
+    <node x="989.0" y="714.0">org.apache.ibatis.datasource.unpooled.UnpooledDataSourceFactory</node>
+    <node x="0.0" y="1237.0">org.apache.ibatis.builder.StaticSqlSource</node>
+    <node x="156.5" y="1136.0">org.apache.ibatis.mapping.SqlSource</node>
+    <node x="1018.0" y="613.0">org.apache.ibatis.datasource.DataSourceFactory</node>
+    <node x="675.0" y="515.0">org.apache.ibatis.executor.statement.SimpleStatementHandler</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="org.apache.ibatis.builder.xml.XMLConfigBuilder" target="org.apache.ibatis.builder.BaseBuilder">
+      <point x="0.0" y="-81.5" />
+      <point x="953.5" y="83.0" />
+      <point x="758.5" y="83.0" />
+      <point x="26.25" y="26.5" />
+    </edge>
+    <edge source="org.apache.ibatis.executor.ReuseExecutor" target="org.apache.ibatis.executor.BaseExecutor">
+      <point x="0.0" y="-26.5" />
+      <point x="150.5" y="792.0" />
+      <point x="428.0" y="792.0" />
+      <point x="-45.0" y="25.5" />
+    </edge>
+    <edge source="org.apache.ibatis.executor.BaseExecutor" target="org.apache.ibatis.executor.Executor">
+      <point x="0.0" y="-25.5" />
+      <point x="473.0" y="689.0" />
+      <point x="543.25" y="689.0" />
+      <point x="-26.5" y="25.5" />
+    </edge>
+    <edge source="org.apache.ibatis.transaction.managed.ManagedTransactionFactory" target="org.apache.ibatis.transaction.TransactionFactory">
+      <point x="0.0" y="-25.5" />
+      <point x="1497.5" y="1212.0" />
+      <point x="1423.25" y="1212.0" />
+      <point x="44.75" y="25.5" />
+    </edge>
+    <edge source="org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory" target="org.apache.ibatis.transaction.TransactionFactory">
+      <point x="0.0" y="-25.5" />
+      <point x="1259.5" y="1212.0" />
+      <point x="1333.75" y="1212.0" />
+      <point x="-44.75" y="25.5" />
+    </edge>
+    <edge source="org.apache.ibatis.executor.BatchExecutor" target="org.apache.ibatis.executor.BaseExecutor">
+      <point x="0.0" y="-26.5" />
+      <point x="794.5" y="792.0" />
+      <point x="518.0" y="792.0" />
+      <point x="45.0" y="25.5" />
+    </edge>
+    <edge source="org.apache.ibatis.executor.statement.CallableStatementHandler" target="org.apache.ibatis.executor.statement.BaseStatementHandler">
+      <point x="0.0" y="-26.5" />
+      <point x="1660.0" y="490.0" />
+      <point x="1059.8333333333333" y="490.0" />
+      <point x="64.33333333333326" y="25.5" />
+    </edge>
+    <edge source="org.apache.ibatis.builder.SqlSourceBuilder" target="org.apache.ibatis.builder.BaseBuilder">
+      <point x="0.0" y="-26.5" />
+      <point x="120.5" y="73.0" />
+      <point x="653.5" y="73.0" />
+      <point x="-78.75" y="26.5" />
+    </edge>
+    <edge source="org.apache.ibatis.session.defaults.DefaultSqlSessionFactory" target="org.apache.ibatis.session.SqlSessionFactory">
+      <point x="0.0" y="-26.5" />
+      <point x="1095.5" y="991.0" />
+      <point x="1156.375" y="991.0" />
+      <point x="-42.75" y="25.5" />
+    </edge>
+    <edge source="org.apache.ibatis.transaction.managed.ManagedTransaction" target="org.apache.ibatis.transaction.Transaction">
+      <point x="0.0" y="-37.5" />
+      <point x="228.0" y="991.0" />
+      <point x="427.5" y="991.0" />
+      <point x="-32.0" y="25.5" />
+    </edge>
+    <edge source="org.apache.ibatis.executor.statement.BaseStatementHandler" target="org.apache.ibatis.executor.statement.StatementHandler">
+      <point x="0.0" y="-25.5" />
+      <point x="995.5" y="387.0" />
+      <point x="1174.5" y="387.0" />
+      <point x="-41.0" y="25.5" />
+    </edge>
+    <edge source="org.apache.ibatis.executor.statement.RoutingStatementHandler" target="org.apache.ibatis.executor.statement.StatementHandler">
+      <point x="0.0" y="-26.5" />
+      <point x="1435.5" y="387.0" />
+      <point x="1256.5" y="387.0" />
+      <point x="41.0" y="25.5" />
+    </edge>
+    <edge source="org.apache.ibatis.session.SqlSessionManager" target="org.apache.ibatis.session.SqlSessionFactory">
+      <point x="-42.75" y="-25.5" />
+      <point x="1302.75" y="991.0" />
+      <point x="1241.875" y="991.0" />
+      <point x="42.75" y="25.5" />
+    </edge>
+    <edge source="org.apache.ibatis.datasource.pooled.PooledDataSourceFactory" target="org.apache.ibatis.datasource.unpooled.UnpooledDataSourceFactory">
+      <point x="0.0" y="-26.5" />
+      <point x="0.0" y="26.5" />
+    </edge>
+    <edge source="org.apache.ibatis.session.defaults.DefaultSqlSession" target="org.apache.ibatis.session.SqlSession">
+      <point x="0.0" y="-37.5" />
+      <point x="1629.0" y="991.0" />
+      <point x="1538.875" y="991.0" />
+      <point x="30.25" y="25.5" />
+    </edge>
+    <edge source="org.apache.ibatis.session.SqlSessionManager" target="org.apache.ibatis.session.SqlSession">
+      <point x="42.75" y="-25.5" />
+      <point x="1388.25" y="991.0" />
+      <point x="1478.375" y="991.0" />
+      <point x="-30.25" y="25.5" />
+    </edge>
+    <edge source="org.apache.ibatis.executor.CachingExecutor" target="org.apache.ibatis.executor.Executor">
+      <point x="0.0" y="-26.5" />
+      <point x="666.5" y="689.0" />
+      <point x="596.25" y="689.0" />
+      <point x="26.5" y="25.5" />
+    </edge>
+    <edge source="org.apache.ibatis.executor.statement.SimpleStatementHandler" target="org.apache.ibatis.executor.statement.BaseStatementHandler">
+      <point x="0.0" y="-26.5" />
+      <point x="0.0" y="25.5" />
+    </edge>
+    <edge source="org.apache.ibatis.builder.xml.XMLStatementBuilder" target="org.apache.ibatis.builder.BaseBuilder">
+      <point x="0.0" y="-37.5" />
+      <point x="511.0" y="83.0" />
+      <point x="706.0" y="83.0" />
+      <point x="-26.25" y="26.5" />
+    </edge>
+    <edge source="org.apache.ibatis.transaction.jdbc.JdbcTransaction" target="org.apache.ibatis.transaction.Transaction">
+      <point x="0.0" y="-37.5" />
+      <point x="691.0" y="991.0" />
+      <point x="491.5" y="991.0" />
+      <point x="32.0" y="25.5" />
+    </edge>
+    <edge source="org.apache.ibatis.builder.StaticSqlSource" target="org.apache.ibatis.mapping.SqlSource">
+      <point x="0.0" y="-37.5" />
+      <point x="0.0" y="25.5" />
+    </edge>
+    <edge source="org.apache.ibatis.cache.impl.PerpetualCache" target="org.apache.ibatis.cache.Cache">
+      <point x="0.0" y="-26.5" />
+      <point x="0.0" y="25.5" />
+    </edge>
+    <edge source="org.apache.ibatis.builder.xml.XMLMapperBuilder" target="org.apache.ibatis.builder.BaseBuilder">
+      <point x="0.0" y="-59.5" />
+      <point x="1416.0" y="73.0" />
+      <point x="811.0" y="73.0" />
+      <point x="78.75" y="26.5" />
+    </edge>
+    <edge source="org.apache.ibatis.executor.statement.PreparedStatementHandler" target="org.apache.ibatis.executor.statement.BaseStatementHandler">
+      <point x="0.0" y="-26.5" />
+      <point x="327.5" y="490.0" />
+      <point x="931.1666666666667" y="490.0" />
+      <point x="-64.33333333333337" y="25.5" />
+    </edge>
+    <edge source="org.apache.ibatis.datasource.unpooled.UnpooledDataSourceFactory" target="org.apache.ibatis.datasource.DataSourceFactory">
+      <point x="0.0" y="-26.5" />
+      <point x="0.0" y="25.5" />
+    </edge>
+    <edge source="org.apache.ibatis.executor.SimpleExecutor" target="org.apache.ibatis.executor.BaseExecutor">
+      <point x="0.0" y="-26.5" />
+      <point x="0.0" y="25.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="0.9564626885655939" x="993.797518412629" y="1083.9323496793972" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Constructors</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>public</VISIBILITY>
+</Diagram>
+

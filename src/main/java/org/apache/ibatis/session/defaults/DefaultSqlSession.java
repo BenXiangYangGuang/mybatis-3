@@ -40,7 +40,7 @@ import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.session.SqlSession;
 
 /**
- * 在 DefaultSq!Session 中使用到了策略模式， DefaultSqlSession 扮演了 Context 的角色，而将所有数据库相关的操作全部封装到 Executor 接口实现中，并通过 executor 字段选择不同的 Executor 实现。
+ * 在 DefaultSqlSession 中使用到了策略模式， DefaultSqlSession 扮演了 Context 的角色，而将所有数据库相关的操作全部封装到 Executor 接口实现中，并通过 executor 字段选择不同的 Executor 实现。
  * The default implementation for {@link SqlSession}.
  * Note that this class is not Thread-Safe.
  *
