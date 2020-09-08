@@ -29,8 +29,5 @@ TypeHandlerRegistry负责管理这些TypeHandler，mybatis系统初始化，会�
 insert 语句 id 自增主键生成策略
 
 
-#### 主要类
-![mybatis-component.png](https://upload-images.jianshu.io/upload_images/8128579-323324b91fb8a947.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
-
 #### 主要类的调用关系
-![mybaits-component-use.png](https://upload-images.jianshu.io/upload_images/8128579-b07d52e3eae6f97e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![主要类的调用关系](./mybaits-component-use.png)

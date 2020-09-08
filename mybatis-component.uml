@@ -193,8 +193,10 @@
       <point x="0.0" y="25.5" />
     </edge>
   </edges>
-  <settings layout="Hierarchic Group" zoom="0.9564626885655939" x="993.797518412629" y="1083.9323496793972" />
-  <SelectedNodes />
+  <settings layout="Hierarchic Group" zoom="0.41151619700597886" x="1084.1785086544105" y="915.3522395979883" />
+  <SelectedNodes>
+    <node>org.apache.ibatis.session.defaults.DefaultSqlSession</node>
+  </SelectedNodes>
   <Categories>
     <Category>Constructors</Category>
   </Categories>
