@@ -1,23 +1,36 @@
-MyBatis SQL Mapper Framework for Java
-=====================================
+#### 解析器
+##### XPath
+##### XPathParser
+- DOM(Document Object Model)解析方式  
+- SAX (Simple API for XML)解析方式 推模式 解析部分XML  
+- JDK 支持的 StAX (Streaming API for XML)解析方式 拉模式 解析部分XML 
+#### 反射
+Java 中的反射虽然功能强大,但是代码编写起来比较复杂且容易出错,为了简化反射操作的相关代码, MyBatis提供了专门的反射模块,该模块位于 org.apache.ibatis.reflection 包中,它对常见的反射操作做了进一步封装,提供了更加简洁方便的反射 API 。
+##### Reflector
+##### ReflectorFactory
+##### TypeParameterResolver
+##### ObjectFactory
+##### Property 工具集
+##### MetaClass
+##### ObjectWrapper
+##### MetaObject
 
-[![Build Status](https://travis-ci.org/mybatis/mybatis-3.svg?branch=master)](https://travis-ci.org/mybatis/mybatis-3)
-[![Coverage Status](https://coveralls.io/repos/mybatis/mybatis-3/badge.svg?branch=master&service=github)](https://coveralls.io/github/mybatis/mybatis-3?branch=master)
-[![Maven central](https://maven-badges.herokuapp.com/maven-central/org.mybatis/mybatis/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.mybatis/mybatis)
-[![Sonatype Nexus (Snapshots)](https://img.shields.io/nexus/s/https/oss.sonatype.org/org.mybatis/mybatis.svg)](https://oss.sonatype.org/content/repositories/snapshots/org/mybatis/mybatis/)
-[![License](http://img.shields.io/:license-apache-brightgreen.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
-[![Stack Overflow](http://img.shields.io/:stack%20overflow-mybatis-brightgreen.svg)](http://stackoverflow.com/questions/tagged/mybatis)
-[![Project Stats](https://www.openhub.net/p/mybatis/widgets/project_thin_badge.gif)](https://www.openhub.net/p/mybatis)
+#### 类型转换
+##### JdbcType
+这个枚举类型代表 java.sql.Types 数据类型；
+##### TypeHandler
+My Batis 中所有的类型转换器都继承了 TypeHandler 接口，规定了javaType和JdbcType类型转换的规范；
+##### TypeReference
+##### TypeHandlerRegistry
+TypeHandlerRegistry负责管理这些TypeHandler，mybatis系统初始化，会为已知的TypeHandler创建对象，并注册到TypeHandlerRegistry中
 
-![mybatis](http://mybatis.github.io/images/mybatis-logo.png)
 
-The MyBatis SQL mapper framework makes it easier to use a relational database with object-oriented applications.
-MyBatis couples objects with stored procedures or SQL statements using a XML descriptor or annotations.
-Simplicity is the biggest advantage of the MyBatis data mapper over object relational mapping tools.
+#### KeyGenerator
+insert 语句 id 自增主键生成策略
 
-Essentials
-----------
 
-* [See the docs](http://mybatis.github.io/mybatis-3)
-* [Download Latest](https://github.com/mybatis/mybatis-3/releases)
-* [Download Snapshot](https://oss.sonatype.org/content/repositories/snapshots/org/mybatis/mybatis/)
+#### 主要类
+![mybatis-component.png](https://upload-images.jianshu.io/upload_images/8128579-323324b91fb8a947.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+#### 主要类的调用关系
+![mybaits-component-use.png](https://upload-images.jianshu.io/upload_images/8128579-b07d52e3eae6f97e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
