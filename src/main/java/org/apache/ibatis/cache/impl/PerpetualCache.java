@@ -22,7 +22,9 @@ import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.cache.CacheException;
 
 /**
- * 永久的缓存,LocalCache一级本地缓存
+ * MyBatis 中的缓存是两层结构的，分为一级缓存、二级缓存，但在本质上是相同的，它们使用的都是 Cache 接口的实现。
+ * Cache 使用了装饰器模式，为 Cache 装饰了多个功能。
+ * 永久的缓存,LocalCache 一级缓存和二级缓存的默认缓存
  * @author Clinton Begin
  */
 public class PerpetualCache implements Cache {

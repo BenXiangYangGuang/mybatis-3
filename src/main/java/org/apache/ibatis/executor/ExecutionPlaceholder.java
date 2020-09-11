@@ -16,7 +16,7 @@
 package org.apache.ibatis.executor;
 
 /**
- * 查询数据库，将这个记录到缓存中国， key 为 SQL 语句，vaule 为 ExecutionPlaceholder Sql执行占位符
+ * 查询数据库，将这个记录到缓存中， key 为 SQL 语句，value 为 ExecutionPlaceholder Sql执行占位符
  *
  * @author Clinton Begin
  */
