@@ -20,13 +20,16 @@ import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
 
 /**
+ * LoggingCache 在 Cache 的基础上提供了日志功能，它通过 hit 宇段和 request 字段记录了 Cache 的命中次数和访问次数。在LoggingCache.getObject() 方法中会统计命中次数和访问次数这两个指标，井按照指定的日志输出方式输出命中率。
  * @author Clinton Begin
  */
 public class LoggingCache implements Cache {
-
+  // log 对象是为了 打印 访问次数、命中次数、命中率而存在的
   private final Log log;
   private final Cache delegate;
+  // 访问次数
   protected int requests = 0;
+  // 命中次数
   protected int hits = 0;
 
   public LoggingCache(Cache delegate) {

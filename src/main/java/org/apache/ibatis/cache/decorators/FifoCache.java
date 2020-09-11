@@ -22,12 +22,14 @@ import org.apache.ibatis.cache.Cache;
 
 /**
  * FIFO (first in, first out) cache decorator.
+ * 先进先出缓存，使用 LinkedList 来实现先进先出
  *
  * @author Clinton Begin
  */
 public class FifoCache implements Cache {
 
   private final Cache delegate;
+  // 用于记录 key 进入缓存先后顺序，使用的是 LinkedList<Object> 类型的集合对象
   private final Deque<Object> keyList;
   private int size;
 
