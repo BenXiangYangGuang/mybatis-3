@@ -115,6 +115,7 @@ public class Configuration {
   protected boolean returnInstanceForEmptyRow;
 
   protected String logPrefix;
+  // 第三方日志实现
   protected Class<? extends Log> logImpl;
   protected Class<? extends VFS> vfsImpl;
   // 一级缓存范围
@@ -148,7 +149,7 @@ public class Configuration {
   protected final MapperRegistry mapperRegistry = new MapperRegistry(this); // mapper 接口类 注册器
   protected final InterceptorChain interceptorChain = new InterceptorChain(); // 插件链，存放 配置文件 配置的插件
   protected final TypeHandlerRegistry typeHandlerRegistry = new TypeHandlerRegistry(this);
-  protected final TypeAliasRegistry typeAliasRegistry = new TypeAliasRegistry();
+  protected final TypeAliasRegistry typeAliasRegistry = new TypeAliasRegistry();      // mybatis 别名注册器
   protected final LanguageDriverRegistry languageRegistry = new LanguageDriverRegistry(); // 动态 SQL 语言驱动插件注册器
 
   protected final Map<String, MappedStatement> mappedStatements = new StrictMap<MappedStatement>("Mapped Statements collection")
@@ -232,7 +233,7 @@ public class Configuration {
   public Class<? extends Log> getLogImpl() {
     return logImpl;
   }
-
+  // 设置 <setting> 中 第三方 log  的日志实现
   public void setLogImpl(Class<? extends Log> logImpl) {
     if (logImpl != null) {
       this.logImpl = logImpl;

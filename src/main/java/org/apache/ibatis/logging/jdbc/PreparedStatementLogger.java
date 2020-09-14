@@ -26,6 +26,9 @@ import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.reflection.ExceptionUtil;
 
 /**
+ * PreparedStatementLogger 添加了 log 功能
+ * PreparedStatementLogger 中封装了 PreparedStatement 对象，也继承了 BaseJdbcLogger 抽象类并实现了 InvocationHandler 接口
+ *
  * PreparedStatement proxy to add logging.
  *
  * @author Clinton Begin
@@ -49,15 +52,20 @@ public final class PreparedStatementLogger extends BaseJdbcLogger implements Inv
       }
       if (EXECUTE_METHODS.contains(method.getName())) {
         if (isDebugEnabled()) {
+          // 输出日志， 查询实参的参数值以及参数类型
           debug("Parameters: " + getParameterValueString(), true);
         }
+        // 清空 BaseJdbcLogger 中实参相关集合
         clearColumnInfo();
+        // 如果调用 executeQuery() 方法， 则为 ResultSet 创建代理对象
         if ("executeQuery".equals(method.getName())) {
           ResultSet rs = (ResultSet) method.invoke(statement, params);
           return rs == null ? null : ResultSetLogger.newInstance(rs, statementLog, queryStack);
         } else {
+          // 不是 executeQuery() 方法 直接返回结果
           return method.invoke(statement, params);
         }
+      //  如果调用 SET_METHODS 集合中的反复，则通过 setColumn() 方法记录到 BaseJdbcLogger 中定义的三个 column* 集合
       } else if (SET_METHODS.contains(method.getName())) {
         if ("setNull".equals(method.getName())) {
           setColumn(params[0], null);
@@ -66,8 +74,10 @@ public final class PreparedStatementLogger extends BaseJdbcLogger implements Inv
         }
         return method.invoke(statement, params);
       } else if ("getResultSet".equals(method.getName())) {
+        // 如果调用 getResultSet() 方法，则为 ResultSet 创建代理对象
         ResultSet rs = (ResultSet) method.invoke(statement, params);
         return rs == null ? null : ResultSetLogger.newInstance(rs, statementLog, queryStack);
+      // 如果调用 getUpdateCount() 方法，则通过日志框架输出其结果
       } else if ("getUpdateCount".equals(method.getName())) {
         int updateCount = (Integer) method.invoke(statement, params);
         if (updateCount != -1) {

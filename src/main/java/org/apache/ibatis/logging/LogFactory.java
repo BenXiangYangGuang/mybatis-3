@@ -18,8 +18,9 @@ package org.apache.ibatis.logging;
 import java.lang.reflect.Constructor;
 
 /**
- * 日志工厂，决定使用哪一个第三方日志
+ * 日志工厂，决定使用哪一个第三方日志，创建记录日志的 Log 对象
  * mybatis 采用适配器模式，适配了 slf4j，log4j 等多个日志框架；
+ * 此类 第一步：创建 logConstructor 对象实例，然后根据 logConstructor 对象实例获取具体的 Log 对象，用来记录日志
  * @author Clinton Begin
  * @author Eduardo Macarron
  */
@@ -47,27 +48,34 @@ public final class LogFactory {
   }
 
   /**
+   * 样例:private static final Log log = LogFactory.getLog(BaseExecutor.class);
+   *
+   * 获取的 Log 对象实例的构造方法的参数包含类名称，所以有了 aClass 这个参数
+   * 这个参数用来记录，哪个类，使用了 log 对象
    * 返回 log 对象
    * @param aClass 使用 log 对象的类名称
    * @return
    */
   public static Log getLog(Class<?> aClass) {
+    // 类名称
     return getLog(aClass.getName());
   }
 
   /**
    * 根据一个类名称，返回一个 Log 对象
-   * @param logger
+   * logConstructor 是项目初始化的时候，进行了创建赋值
+   * @param logger 构造器的参数，要记录日志的类的名称
    * @return
    */
   public static Log getLog(String logger) {
     try {
+      // logger 是 构造器参数
       return logConstructor.newInstance(logger);
     } catch (Throwable t) {
       throw new LogException("Error creating logger for logger " + logger + ".  Cause: " + t, t);
     }
   }
-
+  // 加载 <setting> 配置的第三方日志
   public static synchronized void useCustomLogging(Class<? extends Log> clazz) {
     setImplementation(clazz);
   }
@@ -120,8 +128,10 @@ public final class LogFactory {
   private static void setImplementation(Class<? extends Log> implClass) {
     try {
       //  三方日志的带有 String 参数的构造器，通过构造器创建 log 实例，并 赋值给 logConstructor
+      // 获取 String 类型参数 的构造器；因为 Log4j2Impl 等具体第三方构造器的 参数是 String 类型
       Constructor<? extends Log> candidate = implClass.getConstructor(String.class);
       // LogFactory.class.getName() 仅作为 log 具体实现类中构造函数的参数；
+      // 构造器参数
       Log log = candidate.newInstance(LogFactory.class.getName());
       if (log.isDebugEnabled()) {
         log.debug("Logging initialized using '" + implClass + "' adapter.");

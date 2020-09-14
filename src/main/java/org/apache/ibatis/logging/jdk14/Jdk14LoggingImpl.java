@@ -25,8 +25,10 @@ import org.apache.ibatis.logging.Log;
  */
 public class Jdk14LoggingImpl implements Log {
 
+  // 底层封装的 java.util.logging.Logger 对象
   private final Logger log;
 
+  // 通过 logConstructor.newInstance(logger) 初始化 java.util.logging.Logger 对象; logger 为调用 log 日志的类名称
   public Jdk14LoggingImpl(String clazz) {
     log = Logger.getLogger(clazz);
   }

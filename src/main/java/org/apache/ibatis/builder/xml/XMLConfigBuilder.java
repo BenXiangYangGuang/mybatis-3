@@ -118,6 +118,7 @@ public class XMLConfigBuilder extends BaseBuilder {
       Properties settings = settingsAsProperties(root.evalNode("settings"));
       // TODO: 2020/8/4  vfs 虚拟文件系统
       loadCustomVfs(settings);    // 设置 vfsimpl 字段
+      // 加载 <setting> 节点中配置的 第三方日志实现
       loadCustomLogImpl(settings);
       //解析＜typeAliases＞节点
       typeAliasesElement(root.evalNode("typeAliases"));
@@ -179,7 +180,12 @@ public class XMLConfigBuilder extends BaseBuilder {
     }
   }
 
+  /**
+   * 加载 <setting> 配置的 log 日志实现
+   * @param props
+   */
   private void loadCustomLogImpl(Properties props) {
+    // logImpl 全路径名称
     Class<? extends Log> logImpl = resolveClass(props.getProperty("logImpl"));
     configuration.setLogImpl(logImpl);
   }
