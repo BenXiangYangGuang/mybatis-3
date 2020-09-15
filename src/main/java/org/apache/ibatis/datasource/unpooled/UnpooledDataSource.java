@@ -33,7 +33,7 @@ import javax.sql.DataSource;
 import org.apache.ibatis.io.Resources;
 
 /**
- * 非线程池数据源，主要用来获取 Connection，DataSource 主要用来 获取 Connection 链接，这里实现了 DataSource 获取链接的方法。
+ * 非连接池数据源，主要用来获取 Connection，DataSource 主要用来 获取 Connection 链接，这里实现了 DataSource 获取链接的方法。
  * UnpooledDataSource 覆写了 DataSource 接口定义的 getConnection() 及其重载方法，用于获取数据库连接，
  * 每次通过 UnpooledDataSource.getConnection() 方法都会去数据库连接时都会创建一个新的连接。
  * 获取连接的一般方法：

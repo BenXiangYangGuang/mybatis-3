@@ -33,7 +33,7 @@ import org.apache.ibatis.logging.LogFactory;
 
 /**
  * This is a simple, synchronous, thread-safe database connection pool.
- * PooledDataSource 中管理的真正的数据库连接对象是由 PooledDataSource 中封装的 UnpooledDataSource 对象创建的，并有 PoolState 管理所有连接的状态。
+ * PooledDataSource 中管理的真正的数据库连接对象是由 PooledDataSource 中封装的 UnpooledDataSource 对象创建的，并由 PoolState 管理所有连接的状态，把 UnpooledDataSource 包装成了 PooledDataSource， 从而形成了连接池。
  * @author Clinton Begin
  */
 public class PooledDataSource implements DataSource {
