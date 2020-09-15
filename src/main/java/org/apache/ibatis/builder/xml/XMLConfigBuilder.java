@@ -135,7 +135,7 @@ public class XMLConfigBuilder extends BaseBuilder {
       // read it after objectFactory and objectWrapperFactory issue #631
       //解析＜environments>节点
       environmentsElement(root.evalNode("environments"));
-      //解析＜databaseidProvider＞节点
+      //解析＜databaseIdProvider＞节点
       databaseIdProviderElement(root.evalNode("databaseIdProvider"));
       //解析＜typeHandlers＞节点
       typeHandlerElement(root.evalNode("typeHandlers"));

@@ -24,6 +24,7 @@ import java.sql.SQLException;
 import org.apache.ibatis.reflection.ExceptionUtil;
 
 /**
+ * 连接池中的一个连接，包含一个连接的代理对象，用来实现调用 close() 方法时，进行拦截，将连接重新放入连接池中
  * @author Clinton Begin
  */
 class PooledConnection implements InvocationHandler {
@@ -32,13 +33,23 @@ class PooledConnection implements InvocationHandler {
   private static final Class<?>[] IFACES = new Class<?>[] { Connection.class };
 
   private final int hashCode;
+  // 记录当前 PooledConnection 对象所在的 PooledDataSource 对象。
+  // 该 PooledConnection 是从该 PooledDataSource 中获取的；
+  // 当调用 close() 方法时会将 PooledConnection 放回该 PooledDataSource 中
   private final PooledDataSource dataSource;
+  // 真正的数据连接
   private final Connection realConnection;
+  // 数据库连接代理对象
   private final Connection proxyConnection;
+  // 从数据库连接池 PooledDataSource 中， 获取该链接的时间戳
   private long checkoutTimestamp;
+  // 该连接被创建的时间戳
   private long createdTimestamp;
+  // 最后一次被使用的时间戳
   private long lastUsedTimestamp;
+  // 由数据库 URL、用户名和密码计算出来的 hash 值，可用于标识该连接所在的连接池
   private int connectionTypeCode;
+  // 检测当前 PooledConnection 是否有效，主要是为了防止程序通过 close() 方法将连接归还给连接池之后，依然通过该连接操作数据库
   private boolean valid;
 
   /**
@@ -65,6 +76,7 @@ class PooledConnection implements InvocationHandler {
   }
 
   /**
+   * 连接是否有效，及执行测试 SQL
    * Method to see if the connection is usable.
    *
    * @return True if the connection is usable
@@ -191,6 +203,7 @@ class PooledConnection implements InvocationHandler {
   }
 
   /**
+   * 连接已经取出，检测现在到连接取出的时间段
    * Getter for the time that this connection has been checked out.
    *
    * @return the time
@@ -223,7 +236,7 @@ class PooledConnection implements InvocationHandler {
 
   /**
    * Required for InvocationHandler implementation.
-   *
+   * 主要用来 拦截 close 方法，实现将连接放入连接池中
    * @param proxy  - not used
    * @param method - the method to be executed
    * @param args   - the parameters to be passed to the method
@@ -232,7 +245,9 @@ class PooledConnection implements InvocationHandler {
   @Override
   public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
     String methodName = method.getName();
+    // 如果调用 close() 方法，则将其重新放入连接池，而不是真正关闭数据库连接
     if (CLOSE.equals(methodName)) {
+      // 将连接放入数据库连接池中
       dataSource.pushConnection(this);
       return null;
     }
@@ -240,8 +255,9 @@ class PooledConnection implements InvocationHandler {
       if (!Object.class.equals(method.getDeclaringClass())) {
         // issue #579 toString() should never fail
         // throw an SQLException instead of a Runtime
-        checkConnection();
+        checkConnection();  // 通过 valid 字段检测连接是否有效
       }
+      // 调用真正数据库连接对象的对应方法
       return method.invoke(realConnection, args);
     } catch (Throwable t) {
       throw ExceptionUtil.unwrapThrowable(t);

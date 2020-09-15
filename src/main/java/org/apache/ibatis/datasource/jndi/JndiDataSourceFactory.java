@@ -27,6 +27,10 @@ import org.apache.ibatis.datasource.DataSourceException;
 import org.apache.ibatis.datasource.DataSourceFactory;
 
 /**
+ * JndiDataSourceFactory 是依赖开 JNDI 服务从容器中获取用户配置的 DataSource
+ * JNDI 是 Java Naming and Directory Interface ，Java 命名和目录接口，提供与外界的一个访问关系，只要相关应用、设备能提供服务，那么我们就可以通过JNDI来连接处理。
+ * https://www.cnblogs.com/wlzjdm/p/7856356.html
+ *
  * @author Clinton Begin
  */
 public class JndiDataSourceFactory implements DataSourceFactory {
@@ -41,6 +45,7 @@ public class JndiDataSourceFactory implements DataSourceFactory {
   public void setProperties(Properties properties) {
     try {
       InitialContext initCtx;
+      // 获取 env. 开头的环境变量属性
       Properties env = getEnvProperties(properties);
       if (env == null) {
         initCtx = new InitialContext();
@@ -50,9 +55,12 @@ public class JndiDataSourceFactory implements DataSourceFactory {
 
       if (properties.containsKey(INITIAL_CONTEXT)
           && properties.containsKey(DATA_SOURCE)) {
+        // 查找 initial_context 目录
         Context ctx = (Context) initCtx.lookup(properties.getProperty(INITIAL_CONTEXT));
+        // 查找数据源
         dataSource = (DataSource) ctx.lookup(properties.getProperty(DATA_SOURCE));
       } else if (properties.containsKey(DATA_SOURCE)) {
+        // 直接查找数据源
         dataSource = (DataSource) initCtx.lookup(properties.getProperty(DATA_SOURCE));
       }
 
@@ -66,6 +74,11 @@ public class JndiDataSourceFactory implements DataSourceFactory {
     return dataSource;
   }
 
+  /**
+   * 获取 env. 开头的环境变量属性
+   * @param allProps
+   * @return
+   */
   private static Properties getEnvProperties(Properties allProps) {
     final String PREFIX = ENV_PREFIX;
     Properties contextProperties = null;

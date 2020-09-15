@@ -66,6 +66,7 @@ class LogFactoryTest {
     assertEquals(log.getClass().getName(), Jdk14LoggingImpl.class.getName());
   }
 
+
   @Test
   void shouldUseSlf4j() {
     LogFactory.useSlf4jLogging();

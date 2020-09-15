@@ -27,10 +27,11 @@ import org.apache.ibatis.reflection.wrapper.MapWrapper;
 import org.apache.ibatis.reflection.wrapper.ObjectWrapper;
 import org.apache.ibatis.reflection.wrapper.ObjectWrapperFactory;
 
-/**MetaObject 包装了objectWrapper，从而提供了对 对象属性 的操作
- * MetaObject是Mybatis提供的一个用于方便、优雅访问对象属性的对象，
- * 通过它可以简化代码、不需要try/catch各种reflect异常，同时它支持对JavaBean、Collection、Map三种类型对象的操作。
- * 对 对象的 对属 性表达式解析过程
+/**
+ * MetaObject 包装了 objectWrapper，从而提供了对 对象属性 的操作
+ * MetaObject 是 Mybatis 提供的一个用于方便、优雅访问对象属性的对象，
+ * 通过它可以简化代码、不需要 try/catch 各种 reflect 异常，同时它支持对 JavaBean、Collection、Map 三种类型对象的操作。
+ * 对 对象的 属性表达式解析过程
  * @author Clinton Begin
  */
 public class MetaObject {

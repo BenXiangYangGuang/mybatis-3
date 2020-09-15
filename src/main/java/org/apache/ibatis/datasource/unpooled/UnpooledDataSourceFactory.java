@@ -25,6 +25,7 @@ import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
 
 /**
+ * 非线程池数据源工厂
  * @author Clinton Begin
  */
 public class UnpooledDataSourceFactory implements DataSourceFactory {
@@ -34,27 +35,47 @@ public class UnpooledDataSourceFactory implements DataSourceFactory {
 
   protected DataSource dataSource;
 
+  /**
+   * 直接返回 UnpooledDataSource 对象
+   */
   public UnpooledDataSourceFactory() {
     this.dataSource = new UnpooledDataSource();
   }
 
+  /**
+   * 设置数据源的属性
+   * @param properties mybatis.config.xml 中配置的 dataSource 节点下的属性，包括 driver、url、username 等
+   *
+   * <dataSource type="UNPOOLED">
+   *  <property name="driver" value="org.hsqldb.jdbcDriver" />
+   *  <property name="url" value="jdbc:hsqldb:mem:localtime" />
+   *  <property name="username" value="sa" />
+   * </dataSource>
+   *
+   */
   @Override
   public void setProperties(Properties properties) {
     Properties driverProperties = new Properties();
+    // 创建 dataSource 的 MetaObject 对象
     MetaObject metaDataSource = SystemMetaObject.forObject(dataSource);
+    // 遍历 properties
     for (Object key : properties.keySet()) {
       String propertyName = (String) key;
       if (propertyName.startsWith(DRIVER_PROPERTY_PREFIX)) {
+        //以 driver. 开头的自己置项是对 DataSource 的配置，记录到 driverProperties 中保存
         String value = properties.getProperty(propertyName);
         driverProperties.setProperty(propertyName.substring(DRIVER_PROPERTY_PREFIX_LENGTH), value);
       } else if (metaDataSource.hasSetter(propertyName)) {
         String value = (String) properties.get(propertyName);
+        // 数据类型转换
         Object convertedValue = convertValue(metaDataSource, propertyName, value);
+        // 设置属性给 metaDataSource，从而设置值给 dataSource 对象
         metaDataSource.setValue(propertyName, convertedValue);
       } else {
         throw new DataSourceException("Unknown DataSource property: " + propertyName);
       }
     }
+    // 设置 driverProperties 属性值
     if (driverProperties.size() > 0) {
       metaDataSource.setValue("driverProperties", driverProperties);
     }
@@ -65,6 +86,13 @@ public class UnpooledDataSourceFactory implements DataSourceFactory {
     return dataSource;
   }
 
+  /**
+   * 转换数据类型
+   * @param metaDataSource
+   * @param propertyName
+   * @param value
+   * @return
+   */
   private Object convertValue(MetaObject metaDataSource, String propertyName, String value) {
     Object convertedValue = value;
     Class<?> targetType = metaDataSource.getSetterType(propertyName);
