@@ -29,7 +29,9 @@ import org.apache.ibatis.transaction.Transaction;
  * Delays connection retrieval until getConnection() is called.
  * Ignores all commit or rollback requests.
  * By default, it closes the connection but can be configured not to do it.
- * 管理形的transaction，非事务的；
+ * 容器管理着的 transaction，自己并不提供事务支持；
+ * 忽略所有的 commit 和 rollback 请求；
+ * 默认，connection 是否关闭，可以在配置文件中配置
  * @author Clinton Begin
  *
  * @see ManagedTransactionFactory

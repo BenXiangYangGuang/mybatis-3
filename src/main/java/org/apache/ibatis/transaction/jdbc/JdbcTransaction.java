@@ -33,7 +33,7 @@ import org.apache.ibatis.transaction.TransactionException;
  *
  * 事务直接使用了JDBC提供的 提交和回滚基础设施.
  * 事务依赖于从数据库连接池中重新获取的链接，来管理事务的生命周期.
- * 懒加载，直到调用了getConnection()才会从数据库连接池中重新获取connection.
+ * 懒加载，直到调用了getConnection()才会从数据库连接池中重新获取 connection.
  * 当设置了自动提交，忽略commit和rollback.
  *
  * @author Clinton Begin

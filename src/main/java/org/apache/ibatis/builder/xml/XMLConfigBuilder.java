@@ -271,6 +271,11 @@ public class XMLConfigBuilder extends BaseBuilder {
     }
   }
 
+  /**
+   * 解析 <objectWrapperFactory> 节点
+   * @param context
+   * @throws Exception
+   */
   private void objectWrapperFactoryElement(XNode context) throws Exception {
     if (context != null) {
       String type = context.getStringAttribute("type");
@@ -279,6 +284,11 @@ public class XMLConfigBuilder extends BaseBuilder {
     }
   }
 
+  /**
+   * 解析＜reflectorFactory>节点
+   * @param context
+   * @throws Exception
+   */
   private void reflectorFactoryElement(XNode context) throws Exception {
     if (context != null) {
       String type = context.getStringAttribute("type");
@@ -447,6 +457,10 @@ public class XMLConfigBuilder extends BaseBuilder {
     throw new BuilderException("Environment declaration requires a DataSourceFactory.");
   }
 
+  /**
+   * 解析＜typeHandlers＞节点
+   * @param parent
+   */
   private void typeHandlerElement(XNode parent) {
     if (parent != null) {
       for (XNode child : parent.getChildren()) {

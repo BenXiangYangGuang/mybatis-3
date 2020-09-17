@@ -36,7 +36,7 @@ import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.type.JdbcType;
 
 /**
- * CallableStatementHndler 底层依赖于 java.sql.CallableStatement 调用存储过程，
+ * CallableStatementHandler 底层依赖于 java.sql.CallableStatement 调用存储过程，
  * 其中 parameterize()方法也会调用 ParameterHandler.setParameters（）方法完 SQL 语句参数绑定，并指定输出参数的索引位置和 JDBC 类型。
  * @author Clinton Begin
  */
