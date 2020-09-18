@@ -45,16 +45,8 @@ class SqlSessionManagerTest extends BaseDataTest {
   @Test
   void shouldThrowExceptionIfMappedStatementDoesNotExistAndSqlSessionIsOpen() {
     try {
-      for (int i = 0; i < 2; i++) {
-        Thread t = new Thread(new Runnable() {
-          @Override
-          public void run() {
-            manager.startManagedSession();
-            manager.selectList("ThisStatementDoesNotExist");
-          }
-        });
-        t.start();
-      }
+      manager.startManagedSession();
+      manager.selectList("ThisStatementDoesNotExist");
 
       fail("Expected exception to be thrown due to statement that does not exist.");
     } catch (PersistenceException e) {
