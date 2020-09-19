@@ -25,13 +25,15 @@ import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.Arrays;
 
-/**参数化类型，解决器；对于复杂的参数，进行解决并返回；比如泛型；
+/**
+ * 参数化类型，解决器；对于复杂的参数，进行解决并返回；比如泛型；
  * 它是一个工具类,提供了一系列静态方法来解析指定类中的宇段、方法返回值或方法参数的类型。
  * @author Iwao AVE!
  */
 public class TypeParameterResolver {
 
   /**
+   * 返回字段的数据类型
    * @return The field type as {@link Type}. If it has type parameters in the declaration,<br>
    *         they will be resolved to the actual runtime {@link Type}s.
    */
@@ -45,7 +47,7 @@ public class TypeParameterResolver {
   /**
    * 解决返回值类型
    * 返回参数化类型，如果是复杂的参数化类型，并解决他；
-   * @param method 类的方法
+   * @param method 类的 getter or setter 方法
    * @param srcType 类的全路径名称
    * @return The return type of the method as {@link Type}. If it has type parameters in the declaration,<br>
    *         they will be resolved to the actual runtime {@link Type}s.

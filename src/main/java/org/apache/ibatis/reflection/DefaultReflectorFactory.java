@@ -19,8 +19,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * 反射工厂，用于生产reflector，并缓存
- * 每个 Reflector 对象都对应一个类,在 Reflector中缓存了反射操作需要使用的类的元信息。
+ * 反射工厂，用于生产 reflector，并缓存
+ * 每个 Reflector 对象都对应一个类,在 Reflector 中缓存了反射操作需要使用的类的元信息。
  */
 public class DefaultReflectorFactory implements ReflectorFactory {
   private boolean classCacheEnabled = true;

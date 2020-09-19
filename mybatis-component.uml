@@ -7,14 +7,14 @@
     <node x="0.0" y="515.0">org.apache.ibatis.executor.statement.PreparedStatementHandler</node>
     <node x="560.5" y="714.0">org.apache.ibatis.executor.CachingExecutor</node>
     <node x="472.0" y="1136.0">org.apache.ibatis.datasource.pooled.PooledDataSource</node>
-    <node x="645.0" y="817.0">org.apache.ibatis.executor.BatchExecutor</node>
     <node x="0.0" y="817.0">org.apache.ibatis.executor.ReuseExecutor</node>
+    <node x="645.0" y="817.0">org.apache.ibatis.executor.BatchExecutor</node>
     <node x="0.0" y="158.0">org.apache.ibatis.builder.SqlSourceBuilder</node>
-    <node x="922.0" y="1237.0">org.apache.ibatis.cache.impl.PerpetualCache</node>
     <node x="1118.0" y="1357.0">org.apache.ibatis.cache.TransactionalCacheManager</node>
+    <node x="922.0" y="1237.0">org.apache.ibatis.cache.impl.PerpetualCache</node>
     <node x="1392.0" y="1357.0">org.apache.ibatis.session.SqlSessionFactoryBuilder</node>
-    <node x="951.0" y="1027.0">org.apache.ibatis.session.defaults.DefaultSqlSessionFactory</node>
     <node x="1156.0" y="1237.0">org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory</node>
+    <node x="951.0" y="1027.0">org.apache.ibatis.session.defaults.DefaultSqlSessionFactory</node>
     <node x="1260.0" y="1028.0">org.apache.ibatis.session.SqlSessionManager</node>
     <node x="321.0" y="817.0">org.apache.ibatis.executor.SimpleExecutor</node>
     <node x="899.0" y="413.0">org.apache.ibatis.executor.statement.BaseStatementHandler</node>
@@ -37,14 +37,14 @@
     <node x="261.0" y="147.0">org.apache.ibatis.builder.xml.XMLStatementBuilder</node>
     <node x="1133.5" y="311.0">org.apache.ibatis.executor.statement.StatementHandler</node>
     <node x="1112.0" y="412.0">org.apache.ibatis.executor.statement.RoutingStatementHandler</node>
-    <node x="1336.0" y="515.0">org.apache.ibatis.executor.statement.CallableStatementHandler</node>
     <node x="724.0" y="1357.0">org.apache.ibatis.datasource.pooled.PooledConnection</node>
+    <node x="1336.0" y="515.0">org.apache.ibatis.executor.statement.CallableStatementHandler</node>
     <node x="989.0" y="714.0">org.apache.ibatis.datasource.unpooled.UnpooledDataSourceFactory</node>
     <node x="1659.0" y="1357.0">org.apache.ibatis.mapping.MappedStatement</node>
     <node x="0.0" y="1237.0">org.apache.ibatis.builder.StaticSqlSource</node>
     <node x="156.5" y="1136.0">org.apache.ibatis.mapping.SqlSource</node>
-    <node x="675.0" y="515.0">org.apache.ibatis.executor.statement.SimpleStatementHandler</node>
     <node x="1018.0" y="613.0">org.apache.ibatis.datasource.DataSourceFactory</node>
+    <node x="675.0" y="515.0">org.apache.ibatis.executor.statement.SimpleStatementHandler</node>
   </nodes>
   <notes />
   <edges>
@@ -193,7 +193,7 @@
       <point x="42.75" y="25.5" />
     </edge>
   </edges>
-  <settings layout="Hierarchic Group" zoom="0.38603425559947296" x="992.0" y="749.0" />
+  <settings layout="Hierarchic Group" zoom="0.4156785243741766" x="1019.0" y="749.0" />
   <SelectedNodes>
     <node>org.apache.ibatis.session.defaults.DefaultSqlSession</node>
   </SelectedNodes>

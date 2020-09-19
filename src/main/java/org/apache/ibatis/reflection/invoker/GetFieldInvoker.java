@@ -23,12 +23,20 @@ import org.apache.ibatis.reflection.Reflector;
  * @author Clinton Begin
  */
 public class GetFieldInvoker implements Invoker {
+  // get 一个类的字段
   private final Field field;
 
   public GetFieldInvoker(Field field) {
     this.field = field;
   }
 
+  /**
+   * 调用 target 对象的 字段，并返回字段值
+   * @param target
+   * @param args
+   * @return
+   * @throws IllegalAccessException
+   */
   @Override
   public Object invoke(Object target, Object[] args) throws IllegalAccessException {
     try {
@@ -43,6 +51,10 @@ public class GetFieldInvoker implements Invoker {
     }
   }
 
+  /**
+   * 返回字段的数据类型
+   * @return
+   */
   @Override
   public Class<?> getType() {
     return field.getType();

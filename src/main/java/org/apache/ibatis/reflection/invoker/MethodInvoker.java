@@ -20,12 +20,15 @@ import java.lang.reflect.Method;
 
 import org.apache.ibatis.reflection.Reflector;
 
-/**反射调用的方法和方法类型的封装
+/**
+ * 一个类的 getter 和 setter 方法的封装，方便反射调用，这个类的getter 和 setter 方法，进行 属性赋值
  * @author Clinton Begin
  */
 public class MethodInvoker implements Invoker {
 
+  // getter、setter 方法的类型
   private final Class<?> type; //java.lang.Long
+  // getter、setter 方法
   private final Method method; //public java.lang.Long org.apache.ibatis.reflection.ReflectorTest$AbstractEntity.getId()
 
   public MethodInvoker(Method method) {
@@ -39,6 +42,14 @@ public class MethodInvoker implements Invoker {
     }
   }
 
+  /**
+   * 调用 target 对象的 getter、setter 方法
+   * @param target
+   * @param args
+   * @return
+   * @throws IllegalAccessException
+   * @throws InvocationTargetException
+   */
   @Override
   public Object invoke(Object target, Object[] args) throws IllegalAccessException, InvocationTargetException {
     try {
@@ -53,6 +64,10 @@ public class MethodInvoker implements Invoker {
     }
   }
 
+  /**
+   * 返回 getter 方法的返回数据类型，setter 方法的参数类型
+   * @return
+   */
   @Override
   public Class<?> getType() {
     return type;

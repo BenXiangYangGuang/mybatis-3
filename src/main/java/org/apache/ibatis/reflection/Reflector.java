@@ -45,7 +45,7 @@ import org.apache.ibatis.reflection.property.PropertyNamer;
  * This class represents a cached set of class definition information that
  * allows for easy mapping between property names and getter/setter methods.
  *
- * Reflector 是 MyBatis 中反射模块的基础,每个 Reflector 对象都对应一个类,在 Reflector 中缓存了反射操作需要使用的类的元信息。
+ * Reflector 是 MyBatis 中反射模块的基础,每个 Reflector 对象都对应一个类,在 Reflector 中缓存了反射操作需要使用的类的元信息，包含原始类、类的构造方法、 写字段、读字段、getter 方法、setter 方法 、方法的返回类型。
  *
  * @author Clinton Begin
  */
@@ -54,6 +54,7 @@ public class Reflector {
   private final Class<?> type; //类名称 Section
   private final String[] readablePropertyNames; //可读的类属性 id
   private final String[] writablePropertyNames; //可写的类属性 id
+  // Invoker 是一个封装了一个类的 GetField、SetFiled、getter 和 setter 方法 的对象，供后面反射调用类的字段、getter、setter 方法，方便使用
   private final Map<String, Invoker> setMethods = new HashMap<>(); //<属性，set方法> id,setId
   private final Map<String, Invoker> getMethods = new HashMap<>();
   private final Map<String, Class<?>> setTypes = new HashMap<>();
@@ -68,6 +69,10 @@ public class Reflector {
     addGetMethods(clazz);
     addSetMethods(clazz);
     addFields(clazz); //处理没有getter、setter方法的字段
+    // Set.toArray(T[] a), a 这参数有两个作用，1.指定数组的类型，2.指定数组的大小；如果数组的大小为0，只采用这个数组的类型，大小根据 Set 集合元素的个数；a 数组的大小不为0：新数组大小为 a 这个数组指定的参数大小
+    /**
+     * 对于Set而言，它只知道它内部保存的是Object，所以默认情况下，toArray只能是返回一个由这些Object构成的Object数组出来。但程序的作者或许更清楚其内部元素的更具体的类型，因此，HashSet类提供了toArray的另一个重载版本，允许用户指定一种比Object[]更具体的数组类型，方法是传递一个用户想要的数组类型的一个数组实例进去，多长都无所谓（因此我们常常使用一个0长度的，毕竟把类型带进去就OK了），于是，toArray内部就会按照你想要的这种类型，给构造一个数组出来。这样构造出来的数组，当然是很安全地被调用者转换回那个实际的类型。
+     */
     readablePropertyNames = getMethods.keySet().toArray(new String[0]);
     writablePropertyNames = setMethods.keySet().toArray(new String[0]);
     //读写属性重复，会覆盖
@@ -79,8 +84,13 @@ public class Reflector {
     }
   }
 
+  /**
+   * 添加默认的构造方法
+   * @param clazz
+   */
   private void addDefaultConstructor(Class<?> clazz) {
     Constructor<?>[] constructors = clazz.getDeclaredConstructors();
+    // filter 过滤出满足表达式的元素
     Arrays.stream(constructors).filter(constructor -> constructor.getParameterTypes().length == 0)
       .findAny().ifPresent(constructor -> this.defaultConstructor = constructor);
   }
@@ -94,8 +104,10 @@ public class Reflector {
 //    public abstract void org.apache.ibatis.reflection.ReflectorTest$Entity.setId(java.lang.Object)
 
     Method[] methods = getClassMethods(clazz);
+    // addMethodConflict() 是将一个类的一个属性，的多个 getter 方法，放入 conflictingGetters 集合中，key 是 属性名称，value 是 这个属性的所有的 getter 方法，包含父类继承的等 getter 方法。
     Arrays.stream(methods).filter(m -> m.getParameterTypes().length == 0 && PropertyNamer.isGetter(m.getName()))
       .forEach(m -> addMethodConflict(conflictingGetters, PropertyNamer.methodToProperty(m.getName()), m));
+    //解决多个类、多个接口 的继承 和实现 之间的 多个getter方法 冲突；保留最小辈（下限）类的get方法
     resolveGetterConflicts(conflictingGetters);
   }
   //解决多个类、多个接口 的继承 和实现 之间的 多个getter方法 冲突；保留最小辈（下限）类的get方法，
@@ -128,10 +140,18 @@ public class Reflector {
           break;
         }
       }
+      // 类的属性，类的正确的 getter 方法，getter 方法 封装成 Invoker 对象，放入 getMethods 集合中，然后返回类型放入 getTypes 集合中
       addGetMethod(propName, winner, isAmbiguous);
     }
   }
 
+  /**
+   * 将这个类的这个属性，这个属性的 getter 方法，封装成 MethodInvoker 对象，方便后面反射时，对属性的 getter 方法的操作，
+   * 如果 isAmbiguous 是 true，则会创建一个 AmbiguousMethodInvoker，来提示这个 getter 方法不确实，是不清楚的，方便后面报错
+   * @param name 类的属性名称
+   * @param method 类的属性，对应的 getter 方法
+   * @param isAmbiguous 这个属性的 getter 是否是确定的，是唯一的，不是模糊的
+   */
   private void addGetMethod(String name, Method method, boolean isAmbiguous) {
     MethodInvoker invoker = isAmbiguous
         ? new AmbiguousMethodInvoker(method, MessageFormat.format(
@@ -139,7 +159,9 @@ public class Reflector {
             name, method.getDeclaringClass().getName()))
         : new MethodInvoker(method);
     getMethods.put(name, invoker);
+    // 查找 getter 方法的 返回数据类型
     Type returnType = TypeParameterResolver.resolveReturnType(method, type);
+    // 放入 getTypes 集合中
     getTypes.put(name, typeToClass(returnType));
   }
 
@@ -151,7 +173,14 @@ public class Reflector {
     resolveSetterConflicts(conflictingSetters);
   }
 
+  /**
+   * 处理一个类的属性的多个getter 或者 setter 方法；
+   * @param conflictingMethods key 是一个类的属性，value 是这个属性的所有的 getter 或者 setter 方法
+   * @param name
+   * @param method
+   */
   private void addMethodConflict(Map<String, List<Method>> conflictingMethods, String name, Method method) {
+    // 是否有效的属性值
     if (isValidPropertyName(name)) {
       List<Method> list = conflictingMethods.computeIfAbsent(name, k -> new ArrayList<>());
       list.add(method);
@@ -182,6 +211,13 @@ public class Reflector {
     }
   }
 
+  /**
+   * 冲突的 setter 方法，选择一个合适的 setter 方法返回
+   * @param setter1
+   * @param setter2
+   * @param property
+   * @return
+   */
   private Method pickBetterSetter(Method setter1, Method setter2, String property) {
     if (setter1 == null) {
       return setter2;
@@ -231,7 +267,7 @@ public class Reflector {
     }
     return result;
   }
-  //一个递归的调用关系;处理特殊的field
+  //一个递归的调用关系;处理类的field，方便反射调用，将这个字段的对应方法分别 添加到 setMethods、getMethods、setTypes、getTypes 这几个集合中，方便使用
   private void addFields(Class<?> clazz) {
     Field[] fields = clazz.getDeclaredFields();
     for (Field field : fields) {
@@ -241,10 +277,12 @@ public class Reflector {
         // pr #16 - final static can only be set by the classloader
         int modifiers = field.getModifiers();
         if (!(Modifier.isFinal(modifiers) && Modifier.isStatic(modifiers))) {
+          // 处理类的 set 字段和字段的返回类型
           addSetField(field);
         }
       }
       if (!getMethods.containsKey(field.getName())) {
+        // 处理类的 get 字段和字段的返回类型
         addGetField(field);
       }
     }
@@ -253,6 +291,10 @@ public class Reflector {
     }
   }
 
+  /**
+   * 处理类的 set 字段和字段的返回类型
+   * @param field
+   */
   private void addSetField(Field field) {
     if (isValidPropertyName(field.getName())) {
       setMethods.put(field.getName(), new SetFieldInvoker(field));
@@ -261,6 +303,10 @@ public class Reflector {
     }
   }
 
+  /**
+   * 处理类的 get 字段和字段的返回类型
+   * @param field
+   */
   private void addGetField(Field field) {
     if (isValidPropertyName(field.getName())) {
       getMethods.put(field.getName(), new GetFieldInvoker(field));

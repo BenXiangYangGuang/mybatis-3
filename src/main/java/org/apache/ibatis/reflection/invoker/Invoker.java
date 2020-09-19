@@ -19,11 +19,8 @@ import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author Clinton Begin
- *
- * Invoker 包含get set方法 实现类 Invoker
- * Invoker 包含get set属性 实现类 Invoker
- * Invoker 包含模糊不清方法 实现类 Invoker
- *
+ * Invoker 调用者、是对象 getter 或者 setter 方法、get一个字段、set 一个字段，这几种类方法和属性的封装，方便放射对象调用。
+ * Invoker 有三个实现类 MethodInvoker、GetFieldInvoker、SetFieldInvoker，分别对应 类的getter、setter方法、需要 get 的字段、需要 set 的字段 的封装类*
  */
 public interface Invoker {
   Object invoke(Object target, Object[] args) throws IllegalAccessException, InvocationTargetException;
