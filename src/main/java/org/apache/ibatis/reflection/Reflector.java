@@ -102,7 +102,7 @@ public class Reflector {
 //    public java.lang.Long org.apache.ibatis.reflection.ReflectorTest$AbstractEntity.getId()
 //    public void org.apache.ibatis.reflection.ReflectorTest$AbstractEntity.setId(java.lang.Long)
 //    public abstract void org.apache.ibatis.reflection.ReflectorTest$Entity.setId(java.lang.Object)
-
+    // 获取类的 getter 方法们
     Method[] methods = getClassMethods(clazz);
     // addMethodConflict() 是将一个类的一个属性，的多个 getter 方法，放入 conflictingGetters 集合中，key 是 属性名称，value 是 这个属性的所有的 getter 方法，包含父类继承的等 getter 方法。
     Arrays.stream(methods).filter(m -> m.getParameterTypes().length == 0 && PropertyNamer.isGetter(m.getName()))
@@ -320,6 +320,8 @@ public class Reflector {
   }
 
   /**
+   * 获取类的所有的 getter 方法
+   * 获取类的所有的 getter 方法
    * This method returns an array containing all methods
    * declared in this class and any superclass.
    * We use this method, instead of the simpler <code>Class.getMethods()</code>,
@@ -336,12 +338,13 @@ public class Reflector {
 
       // we also need to look for interface methods -
       // because the class may be abstract
+      // 记录接口中定义的方法
       Class<?>[] interfaces = currentClass.getInterfaces();
       for (Class<?> anInterface : interfaces) {
         addUniqueMethods(uniqueMethods, anInterface.getMethods());
       }
 
-      currentClass = currentClass.getSuperclass();
+      currentClass = currentClass.getSuperclass(); // 获取父类
     }
 
     Collection<Method> methods = uniqueMethods.values();
@@ -349,6 +352,11 @@ public class Reflector {
     return methods.toArray(new Method[0]);
   }
 
+  /**
+   * 解决 getter 方法的唯一性
+   * @param uniqueMethods
+   * @param methods
+   */
   private void addUniqueMethods(Map<String, Method> uniqueMethods, Method[] methods) {
     for (Method currentMethod : methods) {
       if (!currentMethod.isBridge()) {
@@ -363,6 +371,12 @@ public class Reflector {
     }
   }
 
+  /**
+   * getter 方法的签名，确定方法的唯一性
+   * 签名：返回值类型＃方法名称：参数类型列表
+   * @param method
+   * @return
+   */
   private String getSignature(Method method) {
     StringBuilder sb = new StringBuilder();
     Class<?> returnType = method.getReturnType();
@@ -378,6 +392,7 @@ public class Reflector {
   }
 
   /**
+   * 检测成员的访问权限
    * Checks whether can control member accessible.
    *
    * @return If can control member accessible, it return {@literal true}
@@ -424,6 +439,11 @@ public class Reflector {
     return method;
   }
 
+  /**
+   * 根据属性名称，获取对应的 Invoker 对象
+   * @param propertyName
+   * @return
+   */
   public Invoker getGetInvoker(String propertyName) {
     Invoker method = getMethods.get(propertyName);
     if (method == null) {
@@ -448,6 +468,7 @@ public class Reflector {
   }
 
   /**
+   * 获取 getter 方法的数据类型
    * Gets the type for a property getter.
    *
    * @param propertyName - the name of the property
@@ -499,6 +520,11 @@ public class Reflector {
     return getMethods.keySet().contains(propertyName);
   }
 
+  /**
+   * 类是否包含此属性
+   * @param name
+   * @return
+   */
   public String findPropertyName(String name) {
     return caseInsensitivePropertyMap.get(name.toUpperCase(Locale.ENGLISH));
   }

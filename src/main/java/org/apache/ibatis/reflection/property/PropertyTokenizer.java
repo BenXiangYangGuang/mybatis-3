@@ -18,9 +18,7 @@ package org.apache.ibatis.reflection.property;
 import java.util.Iterator;
 
 /**
- * 分词器,编译器
- * orders[0].items[0].name
- * 实现了Iterator，具有迭代功能
+ * 分词器,编译器，解析这样的 orders[0].items[0].name 表达式，实现了Iterator，具有迭代功能
  * @author Clinton Begin
  */
 public class PropertyTokenizer implements Iterator<PropertyTokenizer> {
@@ -63,6 +61,7 @@ public class PropertyTokenizer implements Iterator<PropertyTokenizer> {
     return children;
   }
 
+  // 是否包含孩子节点，即表达式是否包含 . 属性
   @Override
   public boolean hasNext() {
     return children != null;

@@ -20,6 +20,7 @@ import java.lang.reflect.Field;
 import org.apache.ibatis.reflection.Reflector;
 
 /**
+ * PropertyCopier 一个属性拷贝的工具类，主要处理相同类型的两个对象之间的属性拷贝
  * @author Clinton Begin
  */
 public final class PropertyCopier {
@@ -28,6 +29,12 @@ public final class PropertyCopier {
     // Prevent Instantiation of Static Class
   }
 
+  /**
+   * 主要处理相同类型的两个对象之间的属性拷贝
+   * @param type
+   * @param sourceBean 原对象
+   * @param destinationBean 目标对象
+   */
   public static void copyBeanProperties(Class<?> type, Object sourceBean, Object destinationBean) {
     Class<?> parent = type;
     while (parent != null) {

@@ -34,6 +34,7 @@ public class TypeParameterResolver {
 
   /**
    * 返回字段的数据类型
+   * srcType 为 filed 字段所在的类
    * @return The field type as {@link Type}. If it has type parameters in the declaration,<br>
    *         they will be resolved to the actual runtime {@link Type}s.
    */
@@ -74,7 +75,14 @@ public class TypeParameterResolver {
     }
     return result;
   }
-  //解决复杂的参数化类型，等等
+
+  /**
+   * 解决复杂的参数化类型
+   * @param type 字段类型
+   * @param srcType 字段所在类
+   * @param declaringClass 字段 声明所在类
+   * @return
+   */
   private static Type resolveType(Type type, Type srcType, Class<?> declaringClass) {
     //T 泛型变量
     if (type instanceof TypeVariable) {

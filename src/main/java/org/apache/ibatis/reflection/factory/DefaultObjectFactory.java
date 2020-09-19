@@ -24,7 +24,7 @@ import org.apache.ibatis.reflection.ReflectionException;
 import org.apache.ibatis.reflection.Reflector;
 
 /**
- * 创造对象工厂,使用java.lang.reflection
+ * 创造对象工厂,使用 java 反射
  * @author Clinton Begin
  */
 public class DefaultObjectFactory implements ObjectFactory, Serializable {
@@ -39,6 +39,7 @@ public class DefaultObjectFactory implements ObjectFactory, Serializable {
   @SuppressWarnings("unchecked")
   @Override
   public <T> T create(Class<T> type, List<Class<?>> constructorArgTypes, List<Object> constructorArgs) {
+    // 解决集合接口，解决接口默认实现类
     Class<?> classToCreate = resolveInterface(type);
     // we know types are assignable
     return (T) instantiateClass(classToCreate, constructorArgTypes, constructorArgs);
@@ -84,7 +85,9 @@ public class DefaultObjectFactory implements ObjectFactory, Serializable {
       throw new ReflectionException("Error instantiating " + type + " with invalid types (" + argTypes + ") or values (" + argValues + "). Cause: " + e, e);
     }
   }
-
+  /**
+   * 解决集合接口，解决接口默认实现类
+   */
   protected Class<?> resolveInterface(Class<?> type) {
     Class<?> classToCreate;
     if (type == List.class || type == Collection.class || type == Iterable.class) {

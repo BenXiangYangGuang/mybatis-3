@@ -21,7 +21,7 @@ import org.apache.ibatis.reflection.ReflectionException;
 
 /**
  * @author Clinton Begin
- * 获取类的getter、setter 方法 对应的属性名称
+ * 获取类的 getter、setter 方法 对应的属性名称
  * 工具类 getter 和 setter 属性的处理方法;
  */
 public final class PropertyNamer {
