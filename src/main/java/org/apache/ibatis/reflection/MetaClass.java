@@ -28,10 +28,10 @@ import org.apache.ibatis.reflection.property.PropertyTokenizer;
 
 /**
  * @author Clinton Begin
- * MetaClass 是对 Reflector 的封装，是类层次的信息封装
+ * MetaClass 是对 Reflector 的封装，是类层次的信息封装，类的 getter、setter、filed、和他们的数据类型的方法。
  *
  * MetaClass 通过 Reflector 和 PropertyTokenizer 组合使用, 实现了对复杂的属性表达式的解析,并实现了获取指定属性描述信息的功能。
- * 主要实现了 1.检测是否包含这个复杂的属性表达式，2.属性表达式的返回数据类型 3.返回 Reflector 对象的集合信息们。
+ * 主要实现了 1.检测类是否含有 复杂属性表达式的 getter 和 setter 方法 、字段 2.属性表达式的返回数据类型
  */
 public class MetaClass {
   //ReflectorFactory 对象,用于缓存 Reflector 对象

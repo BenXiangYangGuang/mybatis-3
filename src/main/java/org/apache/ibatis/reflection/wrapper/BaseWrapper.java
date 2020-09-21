@@ -23,6 +23,7 @@ import org.apache.ibatis.reflection.ReflectionException;
 import org.apache.ibatis.reflection.property.PropertyTokenizer;
 
 /**
+ * BaseWrapper 抽象类 定义了集合的相关操作
  * @author Clinton Begin
  */
 public abstract class BaseWrapper implements ObjectWrapper {
@@ -42,10 +43,18 @@ public abstract class BaseWrapper implements ObjectWrapper {
     }
   }
 
+  /**
+   * 获取对象的集合属性值
+   * @param prop
+   * @param collection
+   * @return
+   */
   protected Object getCollectionValue(PropertyTokenizer prop, Object collection) {
+    // 如果是 Map 类型，则 index 为 key
     if (collection instanceof Map) {
       return ((Map) collection).get(prop.getIndex());
     } else {
+      // 如果是其他类型，则 index 为下标
       int i = Integer.parseInt(prop.getIndex());
       if (collection instanceof List) {
         return ((List) collection).get(i);
@@ -73,6 +82,12 @@ public abstract class BaseWrapper implements ObjectWrapper {
     }
   }
 
+  /**
+   * 设置对象的集合值
+   * @param prop
+   * @param collection
+   * @param value
+   */
   protected void setCollectionValue(PropertyTokenizer prop, Object collection, Object value) {
     if (collection instanceof Map) {
       ((Map) collection).put(prop.getIndex(), value);

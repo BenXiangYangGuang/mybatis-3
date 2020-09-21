@@ -27,6 +27,8 @@ import org.apache.ibatis.reflection.invoker.Invoker;
 import org.apache.ibatis.reflection.property.PropertyTokenizer;
 
 /**
+ * BeanWrapper 是对象的信息封装，包括 getter、setter 方法、字段、及(getter、setter 方法、字段)的返回数据类型。
+ * 包装了一个 object 对象，还有这个对象所属类的 MetaClass 对象，然后包装了 MetaClass 对象的方法，对外提供方法调用。
  * @author Clinton Begin
  */
 public class BeanWrapper extends BaseWrapper {
@@ -40,16 +42,29 @@ public class BeanWrapper extends BaseWrapper {
     this.metaClass = MetaClass.forClass(object.getClass(), metaObject.getReflectorFactory());
   }
 
+  /**
+   * 获取属性表达式的值
+   * @param prop
+   * @return
+   */
   @Override
   public Object get(PropertyTokenizer prop) {
+    // 存在索引信息，则表示属性表达式中的 name 部分为集合属性
     if (prop.getIndex() != null) {
+      // 通过 MetaObject.getValue() 方法获取 Object 对象中的指定集合属性
       Object collection = resolveCollection(prop, object);
       return getCollectionValue(prop, collection);
     } else {
+      // name 属性为普通对象，查找并调用 Invoker 相关方法获取属性
       return getBeanProperty(prop, object);
     }
   }
 
+  /**
+   * 设置属性表达式的值
+   * @param prop
+   * @param value
+   */
   @Override
   public void set(PropertyTokenizer prop, Object value) {
     if (prop.getIndex() != null) {
@@ -60,21 +75,40 @@ public class BeanWrapper extends BaseWrapper {
     }
   }
 
+  /**
+   * 是否包含这个属性表达式
+   * @param name
+   * @param useCamelCaseMapping
+   * @return
+   */
   @Override
   public String findProperty(String name, boolean useCamelCaseMapping) {
     return metaClass.findProperty(name, useCamelCaseMapping);
   }
 
+  /**
+   * 获取对象的可读属性们
+   * @return
+   */
   @Override
   public String[] getGetterNames() {
     return metaClass.getGetterNames();
   }
 
+  /**
+   * 获取对象的可写属性们
+   * @return
+   */
   @Override
   public String[] getSetterNames() {
     return metaClass.getSetterNames();
   }
 
+  /**
+   * 属性表达式 set 方法参数类型
+   * @param name
+   * @return
+   */
   @Override
   public Class<?> getSetterType(String name) {
     PropertyTokenizer prop = new PropertyTokenizer(name);
@@ -90,6 +124,11 @@ public class BeanWrapper extends BaseWrapper {
     }
   }
 
+  /**
+   * 属性表达式的 get 方法的返回值类型
+   * @param name
+   * @return
+   */
   @Override
   public Class<?> getGetterType(String name) {
     PropertyTokenizer prop = new PropertyTokenizer(name);
@@ -105,6 +144,11 @@ public class BeanWrapper extends BaseWrapper {
     }
   }
 
+  /**
+   * 是否包含属性表达式的 setter 方法
+   * @param name
+   * @return
+   */
   @Override
   public boolean hasSetter(String name) {
     PropertyTokenizer prop = new PropertyTokenizer(name);
@@ -124,6 +168,11 @@ public class BeanWrapper extends BaseWrapper {
     }
   }
 
+  /**
+   * 是否包含表达式的 getter 方法
+   * @param name
+   * @return
+   */
   @Override
   public boolean hasGetter(String name) {
     PropertyTokenizer prop = new PropertyTokenizer(name);
@@ -143,6 +192,13 @@ public class BeanWrapper extends BaseWrapper {
     }
   }
 
+  /**
+   * 为属性表达式指定的属性创建相应的 MetaObject 对象
+   * @param name
+   * @param prop
+   * @param objectFactory
+   * @return
+   */
   @Override
   public MetaObject instantiatePropertyValue(String name, PropertyTokenizer prop, ObjectFactory objectFactory) {
     MetaObject metaValue;
@@ -157,6 +213,12 @@ public class BeanWrapper extends BaseWrapper {
     return metaValue;
   }
 
+  /**
+   * 调用对象的 getter 方法，获取对象属性值
+   * @param prop
+   * @param object
+   * @return
+   */
   private Object getBeanProperty(PropertyTokenizer prop, Object object) {
     try {
       Invoker method = metaClass.getGetInvoker(prop.getName());
@@ -172,6 +234,12 @@ public class BeanWrapper extends BaseWrapper {
     }
   }
 
+  /**
+   * 调用对象的 setter 方法，设置对象属性值
+   * @param prop
+   * @param object
+   * @param value
+   */
   private void setBeanProperty(PropertyTokenizer prop, Object object, Object value) {
     try {
       Invoker method = metaClass.getSetInvoker(prop.getName());
@@ -186,16 +254,27 @@ public class BeanWrapper extends BaseWrapper {
     }
   }
 
+  /**
+   * 对象不是 Collection ，返回 False
+   * @return
+   */
   @Override
   public boolean isCollection() {
     return false;
   }
 
+  /**
+   * 对象不支持 add，集合支持
+   * @param element
+   */
   @Override
   public void add(Object element) {
     throw new UnsupportedOperationException();
   }
-
+  /**
+   * 对象不支持 addAll，集合支持
+   * @param list
+   */
   @Override
   public <E> void addAll(List<E> list) {
     throw new UnsupportedOperationException();

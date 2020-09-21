@@ -24,6 +24,7 @@ import org.apache.ibatis.reflection.property.PropertyTokenizer;
 
 /**
  * @author Clinton Begin
+ * 集合类型对象包装器
  * Collection Wrapper 实现了 ObjectWrapper 接口,其中封装了 Collection<Object>类型的对象,
  * 但它大部分实现方法都会抛出 UnsupportedOperationException 异常
  */

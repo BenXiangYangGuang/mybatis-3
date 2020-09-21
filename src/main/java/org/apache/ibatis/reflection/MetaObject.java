@@ -28,10 +28,18 @@ import org.apache.ibatis.reflection.wrapper.ObjectWrapper;
 import org.apache.ibatis.reflection.wrapper.ObjectWrapperFactory;
 
 /**
- * MetaObject 包装了 objectWrapper，从而提供了对 对象属性 的操作
+ * MetaObject 是对象层级的包装，对象的 getter、setter、filed、和他们的数据类型的方法。
+ *
+ *
  * MetaObject 是 Mybatis 提供的一个用于方便、优雅访问对象属性的对象，
  * 通过它可以简化代码、不需要 try/catch 各种 reflect 异常，同时它支持对 JavaBean、Collection、Map 三种类型对象的操作。
- * 对 对象的 属性表达式解析过程
+ *
+ * MetaObject 包装了 objectWrapper，从而提供了对 对象属性 的操作。
+ *
+ * 反射包的大部分类都是为 MetaObject 服务的，这个是对外暴露的对象原信息操作的接口。
+ * 服务类包括：Reflector、ReflectorFactory、MetaClass、ObjectFactory 接口和实现、Invoker 接口和实现、ObjectWrapper 接口和实现、Property 属性工具类。
+ * 包装关系：MetaObject -> ObjectWrapper -> MetaClass -> Reflector -> 元类的基础信息（filed、getter、setter 方法、读写属性、成员的数据类型、方法的调用）
+ *
  * @author Clinton Begin
  */
 public class MetaObject {
@@ -106,10 +114,11 @@ public class MetaObject {
     return objectWrapper.getGetterType(name);
   }
 
+  //判断属性表达式指定属性是 否有 setter 方法
   public boolean hasSetter(String name) {
     return objectWrapper.hasSetter(name);
   }
-
+  //判断属性表达式指定属性是 否有 getter 方法
   public boolean hasGetter(String name) {
     return objectWrapper.hasGetter(name);
   }
@@ -137,6 +146,7 @@ public class MetaObject {
           // don't instantiate child path if value is null
           return;
         } else {
+          // 为属性表达式指定的属性创建相应的MetaObject对象
           metaValue = objectWrapper.instantiatePropertyValue(name, prop, objectFactory);
         }
       }
@@ -155,14 +165,27 @@ public class MetaObject {
     return objectWrapper;
   }
 
+  /**
+   * 是否是集合
+   * @return
+   */
   public boolean isCollection() {
     return objectWrapper.isCollection();
   }
 
+  /**
+   * 向集合中添加元素
+   * @param element
+   */
   public void add(Object element) {
     objectWrapper.add(element);
   }
 
+  /**
+   * 向集合中添加多个元素
+   * @param list
+   * @param <E>
+   */
   public <E> void addAll(List<E> list) {
     objectWrapper.addAll(list);
   }
