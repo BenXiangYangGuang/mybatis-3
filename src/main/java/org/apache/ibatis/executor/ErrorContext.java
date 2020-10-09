@@ -16,19 +16,33 @@
 package org.apache.ibatis.executor;
 
 /**
- * @author Clinton Begin
+ * 错误上下文、环境，用来存储已经发生错误的信息,主要被 ExceptionFactory 对象使用
+ * ErrorContext 主要用来存储当前线程的错误信息，ExceptionFactory 使用 ErrorContext 当前线程中存储的错误信息，来包装成 RuntimeException 对象进行错误抛出。
+ * 主要使用在三个方面：
+ * 1. SqlSessionFactoryBuilder 中 build() 方法中解析 mybatis-config.xml、**.mapper 实体文件的错误，来构建 SqlSessionFactory 对象
+ * 2. DefaultSqlSessionFactory 中获取 Session 对象的时候的错误
+ * 3. DefaultSqlSession 对象中进行数据查询、更新、新增、删除等数据库操作时的错误，还有事务回滚、提交、SQL 刷新等
+r Clinton Begin
  */
 public class ErrorContext {
 
   private static final String LINE_SEPARATOR = System.getProperty("line.separator","\n");
+  // 本地线程变量、线程安全
   private static final ThreadLocal<ErrorContext> LOCAL = new ThreadLocal<>();
 
   private ErrorContext stored;
+  // 错误资源文件 **.mapper 实体 mapper 文件
   private String resource;
+  // 错误事件 解析 **.mapper 文件中的 sqlNode 节点事件
   private String activity;
+  // 存在错误的主体对象
   private String object;
+  // 错误信息
   private String message;
+
+  // 错误 SQL
   private String sql;
+  // 错误原因
   private Throwable cause;
 
   private ErrorContext() {
@@ -43,6 +57,10 @@ public class ErrorContext {
     return context;
   }
 
+  /**
+   * 把当前线程的 ErrorContext 对象，存储在新建的 newContext.stored 变量中，然后 newContext 变为 ThreadLocal 新的错误上下文对象
+   * @return
+   */
   public ErrorContext store() {
     ErrorContext newContext = new ErrorContext();
     newContext.stored = this;
@@ -50,6 +68,10 @@ public class ErrorContext {
     return LOCAL.get();
   }
 
+  /**
+   * 重新设置本地线程中的 ErrorContext 对象，为原来存储的 stored 中的 ErrorContext 对象
+   * @return
+   */
   public ErrorContext recall() {
     if (stored != null) {
       LOCAL.set(stored);
