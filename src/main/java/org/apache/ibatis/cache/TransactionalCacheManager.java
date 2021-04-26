@@ -26,7 +26,7 @@ import org.apache.ibatis.cache.decorators.TransactionalCache;
  * @author Clinton Begin
  */
 public class TransactionalCacheManager {
-
+  // cache 为：MappedStatement.cache 作为 key，实现了单一性，作为多个 CachingExecutor 多个 TransactionalCacheManager 的多个 transactionalCaches；而 key 是唯一的。
   private final Map<Cache, TransactionalCache> transactionalCaches = new HashMap<>();
 
   /**

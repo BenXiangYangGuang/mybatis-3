@@ -27,6 +27,10 @@ import org.apache.ibatis.logging.LogFactory;
 /**
  *
  * TransactionalCache 主要用于保存 某个 SqlSession 的 某个事务中需要向 某个二级缓存中添加的缓存 的数据。
+ * 主要是针对二级缓存解决事务问题，提出的解决方案，如果没有事务问题，可以直接放入MappedStatement.cache这个二级缓存中，不必再有 TransactionalCache 这个集合。
+ * 因为事务问题所以出现了 TransactionalCache，TransactionalCacheManager 的 Map<Cache, TransactionalCache> transactionalCaches，TransactionalCache 代替了 Cache，
+ * 作为一个解决事务问题的提交回滚可见性的临时变量 entriesToAddOnCommit，commit 时在提交，解决了事务可见性问题。
+ *
  * The 2nd level cache transactional buffer.
  * <p>
  * This class holds all cache entries that are to be added to the 2nd level cache during a Session.

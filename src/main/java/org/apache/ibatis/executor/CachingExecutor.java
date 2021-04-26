@@ -40,6 +40,9 @@ import org.apache.ibatis.transaction.Transaction;
  * CachingExecutor 为 Executor 装饰了二级缓存功能
  * TransactionalCacheManager 管理了所有的 以 namespace 为存储单位的二级缓存
  * TransactionalCache 是二级缓存 Cache 的代理类，对外提供了二级缓存的功能，里面包装了二级缓存 Cache 对象(delegate)，这个delegate 提供了真实的数据缓存功能。
+ * TransactionalCacheManager 是在每个 CachingExecutor 中出现的，而它是全局缓存，
+ * 这个是通过 TransactionalCacheManager 中的 Map<Cache, TransactionalCache> transactionalCaches 变量中的 key 来实现全局缓存的问题，
+ * 因为 MappedStatement.cache 作为 key 是唯一的。一个 MappedFile 是唯一的，二级缓存都是依靠 MappedFile 为维护来实现的。
  * @author Clinton Begin
  * @author Eduardo Macarron
  */
@@ -219,7 +222,7 @@ public class CachingExecutor implements Executor {
   }
 
   /**
-   * 是否要求刷新 一级和二级缓存
+   * 是否要求刷新 二级缓存
    * @param ms
    */
   private void flushCacheIfRequired(MappedStatement ms) {
