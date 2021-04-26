@@ -52,7 +52,7 @@ public class TransactionalCache implements Cache {
   private boolean clearOnCommit;
   // 暂时记录添加到 TransactionalCache 中的数据。在事务提交时，会将其中的数据添加到二级缓存中
   private final Map<Object, Object> entriesToAddOnCommit;
-  // 记录缓存未命中的 CacheKey 对象
+  // 记录缓存未命中的 CacheKey 对象,是为了在 commit rollback 时，调用此集合元素中的 putObject、removeObject 方法，解锁 BlockingCache 中 getObject(),方法加上的锁，避免出现死锁，在commit、rollback时，进行锁的释放。
   private final Set<Object> entriesMissedInCache;
 
   public TransactionalCache(Cache delegate) {
@@ -160,7 +160,7 @@ public class TransactionalCache implements Cache {
     for (Map.Entry<Object, Object> entry : entriesToAddOnCommit.entrySet()) {
       delegate.putObject(entry.getKey(), entry.getValue());
     }
-    // 遍历 entriesMissedInCache 集合，缓存为命中的，且 entriesToAddOnCommit 集合中不包含的缓存项， 添加到二级缓冲中
+    // 遍历 entriesMissedInCache 集合，缓存为命中的，且 entriesToAddOnCommit 集合中不包含的缓存项， 添加到二级缓冲中，进行getObject的锁的释放，避免死锁。
     for (Object entry : entriesMissedInCache) {
       if (!entriesToAddOnCommit.containsKey(entry)) {
         delegate.putObject(entry, null);
